@@ -9,13 +9,44 @@
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
   <script src="//code.jquery.com/qunit/qunit-1.14.0.js"></script>
-  <script src="../ds-js.js"></script>
-
+  <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.11/require.min.js"></script>
   <script>
-	QUnit.test("define a kind for the query", function( assert ) {
-		var query = new Query('Kind');
-		assert.equal(query.kind, "Kind");
-		assert.propEqual({kind: 'Kind'}, query.toJSON());
+	require.config({
+	    "paths": {
+	      "jquery": "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min"
+	    }
+	});
+	require(['../ds-js'], function(ds) {
+		QUnit.module('Query tests')
+		QUnit.test("Define a kind.", function(assert) {
+			var query = new ds.Query('Kind');
+			assert.strictEqual(query.kind, "Kind");
+			assert.deepEqual(query.toJSON(), {kind: 'Kind'});
+		});
+		QUnit.test("Select fields.", function(assert) {
+			var query = new ds.Query('Kind');
+			assert.deepEqual(query.select('fieldA', 'fieldB'), query);
+			assert.deepEqual(query.fields, ['fieldA', 'fieldB']);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', fields: ['fieldA', 'fieldB']});
+		});
+		QUnit.test("Create an equality filter.", function(assert) {
+			var query = new ds.Query('Kind');
+			assert.deepEqual(query.eq('fieldA', 'valueA'), query);
+			assert.deepEqual(query.filters, [{field: 'fieldA', operator: '=', value: 'valueA'}]);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', filters: [{field: 'fieldA', operator: '=', value: 'valueA'}]});
+		});
+		QUnit.test("Create a greater than filter.", function(assert) {
+			var query = new ds.Query('Kind');
+			assert.deepEqual(query.gt('fieldA', 5), query);
+			assert.deepEqual(query.filters, [{field: 'fieldA', operator: '>', value: 5}]);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', filters: [{field: 'fieldA', operator: '>', value: 5}]});
+		});
+		QUnit.test("Create a less than filter.", function(assert) {
+			var query = new ds.Query('Kind');
+			assert.deepEqual(query.lt('fieldA', 5), query);
+			assert.deepEqual(query.filters, [{field: 'fieldA', operator: '<', value: 5}]);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', filters: [{field: 'fieldA', operator: '<', value: 5}]});
+		});
 	});
   </script>
 </body>
