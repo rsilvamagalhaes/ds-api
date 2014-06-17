@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>DS Api Test</title>
+  <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.14.0.css">
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src="//code.jquery.com/qunit/qunit-1.14.0.js"></script>
+  <script src="../ds-js.js"></script>
+
+  <script>
+	QUnit.test("define a kind for the query", function( assert ) {
+		var query = new Query('Kind');
+		assert.equal(query.kind, "Kind");
+		assert.propEqual({kind: 'Kind'}, query.toJSON());
+	});
+  </script>
+</body>
+</html>
