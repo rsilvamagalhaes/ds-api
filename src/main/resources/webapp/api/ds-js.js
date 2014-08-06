@@ -53,9 +53,13 @@ define(['jquery'], function($) {
 		var DATE_TYPE = 'date';
 		var KEY_TYPE = 'key'
 
+		var API_URL = '/api/query';
+
 		var _this = this;
+		this.url = API_URL;
 		this.kind = kind;
 		this.filters = [];
+		this.cursors = [];
 		this.select = function() {
 			this.fields = $.makeArray(arguments);
 			return this;
@@ -131,7 +135,43 @@ define(['jquery'], function($) {
 			if (this.filters.length > 0) {
 				json.filters = this.filters;	
 			}
+			if (this.cursors.length > 0) {
+				json.cursor = this.cursors[this.cursors.length - 1];
+			}
 			return json;
+		}
+		var fetch = function() {
+			var jqXHR = $.ajax({
+				dataType: "json",
+				type: 'get',
+				url: _this.url,
+				data : JSON.stringify(_this.toJSON())
+			}).done(function(json) {
+				_this.cursors.push(json.cursor) ;
+			});
+			jqXHR.list = function(cb) {
+				jqXHR.done(function(json) {
+					cb.call(_this, json.result);
+				});
+				return jqXHR;
+			}
+			jqXHR.iterate = function(cb) {
+				jqXHR.done(function(json) {
+					var result = json.result;
+					for (var i = 0; i < result.length; i++) {
+						cb.call(_this, result[i]);
+					}
+				});
+				return jqXHR;
+			}
+			return jqXHR;
+		}
+		this.execute = function() {
+			this.cursors = [];
+			return fetch();
+		}
+		this.next = function() {
+			return fetch();
 		}
 	}
 	// utils
