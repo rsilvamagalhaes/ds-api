@@ -3,11 +3,14 @@ from bottle import Bottle
 bottle = Bottle()
 
 
-class GenericModel(ndb.Expando):
+def createGeneric(kind):
 
-    @classmethod
-    def _get_kind(cls):
-        return 'Entidade'
+   class GenericModel(ndb.Expando):
+        @classmethod
+        def _get_kind(cls):
+            return kind
+
+   return GenericModel()
 
 
 @bottle.get('/person/dyn')
@@ -26,8 +29,7 @@ def dynamic():
         ]
     }
 
-    p = GenericModel()
-    p.kind = 'User'
+    p = createGeneric('User')
 
     for field in json['fields']:
         setattr(p, field['field'], field['value'])
