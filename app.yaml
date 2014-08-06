@@ -9,8 +9,8 @@ handlers:
 - url: /h/.*
   script: hello.bottle
 
-- url: /person/.*
-  script: person.bottle
+- url: /query/.*
+  script: query.bottle
 
 - url: /p
   static_dir: public
