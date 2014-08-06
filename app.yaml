@@ -11,3 +11,6 @@ handlers:
 
 - url: /person/.*
   script: person.bottle
+
+- url: /p
+  static_dir: public

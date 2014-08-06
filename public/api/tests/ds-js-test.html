@@ -117,7 +117,7 @@
 			assert.deepEqual(query.filters, [{field: 'keyField', operator: '=', value: key.toJSON(), type: 'key'}]);
 			assert.deepEqual(query.toJSON(), {kind: 'Kind', filters: [{field: 'keyField', operator: '=', value: key.toJSON(), type: 'key'}]});
 		});
-		QUnit.module('Key tests')
+		QUnit.module('Key tests');
 		QUnit.test("Create a key.", function(assert) {
 			var key = new ds.Key('Entity', 'someName');
 			assert.deepEqual(key.toJSON(), {entity: 'Entity', name: 'someName'});
@@ -133,6 +133,42 @@
 		QUnit.test("Create a key from raw data.", function(assert) {
 			var key = ds.Key.raw('raw-data');
 			assert.deepEqual(key.toJSON(), {raw : 'raw-data'});
+		});
+		QUnit.module('Integration tests');
+		QUnit.asyncTest("Execute a query and iterate over it's results.", function(assert) {
+			var query = new ds.Query('Kind');
+			query.url = 'result.json';
+			var results = [];
+			var resultList;
+			var jqXHR = query.execute();
+			jqXHR.iterate(function(result) {
+				results.push(result);
+			});
+			jqXHR.list(function(_resultList) {
+				resultList = _resultList;
+			});
+			jqXHR.done(function() {
+				QUnit.start();
+				assert.equal(resultList.length, results.length);
+				assert.deepEqual(resultList[0], results[0]);
+			}).fail(function(obj, b, e) {
+				QUnit.start();
+				console.info(e.toString());
+			});
+		});
+		QUnit.asyncTest("Execute a query and request next page with cursor.", function(assert) {
+			var query = new ds.Query('Kind');
+			query.url = 'result.json';
+			var jqXHR = query.execute();
+			jqXHR = jqXHR.then(function() {
+				QUnit.start();
+				assert.deepEqual(query.cursors, ['cursor-data']);
+				assert.deepEqual(query.toJSON(), {kind: 'Kind', cursor : 'cursor-data'});
+				return query.next();
+			}).fail(function(obj, b, e) {
+				QUnit.start();
+				console.info(e.toString());
+			});
 		});
 	});
   </script>
