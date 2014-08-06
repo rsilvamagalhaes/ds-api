@@ -16,7 +16,6 @@ define(['jquery'], function($) {
 				} else 	if (typeof id == 'number') {
 					key['id'] = id;
 				}
-				console.info('_this.key', _this.key, idx);
 				if (idx > 1) {
 					var ancestor = {};
 					key.ancestor = ancestor;
@@ -51,6 +50,9 @@ define(['jquery'], function($) {
 		var ASC_DIRECTION = 'ASC';
 		var DESC_DIRECTION = 'DESC';
 
+		var DATE_TYPE = 'date';
+		var KEY_TYPE = 'key'
+
 		var _this = this;
 		this.kind = kind;
 		this.filters = [];
@@ -82,7 +84,16 @@ define(['jquery'], function($) {
 			return addFilter(field, LTE_FILTER, value);
 		}
 		var addFilter = function(field, operator, value) {
-			_this.filters.push({field: field, operator: operator, value: value});
+			var filter = {field: field, operator: operator};
+			if (value instanceof Date) {
+				value = value.getTime();
+				filter.type = DATE_TYPE;
+			} else if (value instanceof Key) {
+				value = value.toJSON();
+				filter.type = KEY_TYPE;
+			}
+			filter.value = value;
+			_this.filters.push(filter);
 			return _this;
 		}
 		this.order = function() {

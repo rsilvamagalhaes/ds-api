@@ -103,6 +103,20 @@
 			assert.deepEqual(query.queryKey, key);
 			assert.deepEqual(query.toJSON(), {kind: 'Kind', key: {entity: 'Entity', name: 'someName'}});
 		});
+		QUnit.test("Create a filter with a date parameter.", function(assert) {
+			var query = new ds.Query('Kind');
+			var dateParam = new Date();
+			query.eq('dateField', dateParam);
+			assert.deepEqual(query.filters, [{field: 'dateField', operator: '=', value: dateParam.getTime(), type: 'date'}]);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', filters: [{field: 'dateField', operator: '=', value: dateParam.getTime(), type: 'date'}]});
+		});
+		QUnit.test("Create a filter with a key parameter.", function(assert) {
+			var query = new ds.Query('Kind');
+			var key = new ds.Key('Entity', 'someName');
+			query.eq('keyField', key);
+			assert.deepEqual(query.filters, [{field: 'keyField', operator: '=', value: key.toJSON(), type: 'key'}]);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', filters: [{field: 'keyField', operator: '=', value: key.toJSON(), type: 'key'}]});
+		});
 		QUnit.module('Key tests')
 		QUnit.test("Create a key.", function(assert) {
 			var key = new ds.Key('Entity', 'someName');
