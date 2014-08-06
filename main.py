@@ -1,5 +1,6 @@
 from bottle import Bottle
-from lib.pyv8 import PyV8
+import lib.execjs as execjs
+
 bottle = Bottle()
 
 # Note: We don't need to call run() since our application is embedded within
@@ -8,9 +9,13 @@ bottle = Bottle()
 
 @bottle.get('/runjs')
 def hello():
-    ctxt = PyV8.JSContext()
-    ctxt.enter()
-    return 'resultado: ' + str(ctxt.eval('1+1'))
+    ctx = execjs.compile("""
+     function add(x, y) {
+         return x + y;
+     }
+    """)
+    ctx.call('add',1, 2)
+
 
 @bottle.error(404)
 def error_404(error):
