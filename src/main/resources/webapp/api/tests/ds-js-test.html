@@ -89,6 +89,20 @@
 			assert.deepEqual(query.lim, 10);
 			assert.deepEqual(query.toJSON(), {kind: 'Kind', limit: 10});
 		});
+		QUnit.test("Create an ancestor clause.", function(assert) {
+			var query = new ds.Query('Kind');
+			var key = new ds.Key('ParentEntity', 15);
+			assert.deepEqual(query.ancestor(key), query);
+			assert.deepEqual(query.ancestorKey, key);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', ancestor: {entity: 'ParentEntity', id: 15}});
+		});
+		QUnit.test("Create an key clause.", function(assert) {
+			var query = new ds.Query('Kind');
+			var key = new ds.Key('Entity', 'someName');
+			assert.deepEqual(query.key(key), query);
+			assert.deepEqual(query.queryKey, key);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', key: {entity: 'Entity', name: 'someName'}});
+		});
 		QUnit.module('Key tests')
 		QUnit.test("Create a key.", function(assert) {
 			var key = new ds.Key('Entity', 'someName');
@@ -96,11 +110,11 @@
 		});
 		QUnit.test("Create a key with a parent.", function(assert) {
 			var key = new ds.Key('ParentEntity', 15, 'Entity', 'someName');
-			assert.deepEqual(key.toJSON(), {entity: 'Entity', name: 'someName', ancestor : { entity: 'ParentEntity', id: 15}});
+			assert.deepEqual(key.toJSON(), {entity: 'Entity', name: 'someName', ancestor : {entity: 'ParentEntity', id: 15}});
 		});
 		QUnit.test("Create a key with more than one parent.", function(assert) {
 			var key = new ds.Key('GrandParentEntity', 'someOldName', 'ParentEntity', 15, 'Entity', 'someName');
-			assert.deepEqual(key.toJSON(), {entity: 'Entity', name: 'someName', ancestor : { entity: 'ParentEntity', id: 15, 'ancestor' : {entity: 'GrandParentEntity', name: 'someOldName'}}});
+			assert.deepEqual(key.toJSON(), {entity: 'Entity', name: 'someName', ancestor : {entity: 'ParentEntity', id: 15, 'ancestor' : {entity: 'GrandParentEntity', name: 'someOldName'}}});
 		});
 		QUnit.test("Create a key from raw data.", function(assert) {
 			var key = ds.Key.raw('raw-data');

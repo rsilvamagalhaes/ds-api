@@ -97,12 +97,26 @@ define(['jquery'], function($) {
 			this.lim = lim;
 			return this;
 		}
+		this.ancestor = function(ancestor) {
+			this.ancestorKey = ancestor;
+			return this;
+		}
+		this.key = function(queryKey) {
+			this.queryKey = queryKey;
+			return this;
+		}
 		this.toJSON = function() {
 			var json = {};
 			toSafeJSON('kind', this.kind, json);
 			toSafeJSON('fields', this.fields, json);
 			toSafeJSON('order', this.ordering, json);
 			toSafeJSON('limit', this.lim, json);
+			if (this.ancestorKey) {
+				json.ancestor = this.ancestorKey.toJSON();
+			}
+			if (this.queryKey) {
+				json.key = this.queryKey.toJSON();
+			}
 			if (this.filters.length > 0) {
 				json.filters = this.filters;	
 			}
