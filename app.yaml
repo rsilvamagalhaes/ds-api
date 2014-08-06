@@ -5,5 +5,9 @@ api_version: 1
 threadsafe: yes
 
 handlers:
-- url: .*
-  script: main.bottle
+
+- url: /h/.*
+  script: hello.bottle
+
+- url: /person/.*
+  script: person.bottle
