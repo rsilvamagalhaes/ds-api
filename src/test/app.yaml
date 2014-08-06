@@ -6,8 +6,9 @@ threadsafe: no
 
 handlers:
 
-- url: /h/.*
-  script: hello.bottle
+- url: .*
+  script: main.bottle
 
-- url: /person/.*
-  script: person.bottle
+libraries:
+- name: yaml
+  version: "latest"
