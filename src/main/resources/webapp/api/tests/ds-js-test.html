@@ -74,8 +74,37 @@
 		QUnit.test("Create an order by clause.", function(assert) {
 			var query = new ds.Query('Kind');
 			assert.deepEqual(query.order('fieldA', 'fieldB'), query);
-			assert.deepEqual(query.order, ['fieldA', 'fieldB']);
-			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: ['fieldA', 'fieldB']});
+			assert.deepEqual(query.ordering, {direction: 'ASC' ,fields : ['fieldA', 'fieldB']});
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: {direction: 'ASC' ,fields : ['fieldA', 'fieldB']}});
+		});
+		QUnit.test("Create an order by (descending) clause.", function(assert) {
+			var query = new ds.Query('Kind');
+			assert.deepEqual(query.orderDesc('fieldA', 'fieldB'), query);
+			assert.deepEqual(query.ordering, {direction: 'DESC' ,fields : ['fieldA', 'fieldB']});
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: {direction: 'DESC' ,fields : ['fieldA', 'fieldB']}});
+		});
+		QUnit.test("Create a limit clause.", function(assert) {
+			var query = new ds.Query('Kind');
+			assert.deepEqual(query.limit(10), query);
+			assert.deepEqual(query.lim, 10);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', limit: 10});
+		});
+		QUnit.module('Key tests')
+		QUnit.test("Create a key.", function(assert) {
+			var key = new ds.Key('Entity', 'someName');
+			assert.deepEqual(key.toJSON(), {entity: 'Entity', name: 'someName'});
+		});
+		QUnit.test("Create a key with a parent.", function(assert) {
+			var key = new ds.Key('ParentEntity', 15, 'Entity', 'someName');
+			assert.deepEqual(key.toJSON(), {entity: 'Entity', name: 'someName', ancestor : { entity: 'ParentEntity', id: 15}});
+		});
+		QUnit.test("Create a key with more than one parent.", function(assert) {
+			var key = new ds.Key('GrandParentEntity', 'someOldName', 'ParentEntity', 15, 'Entity', 'someName');
+			assert.deepEqual(key.toJSON(), {entity: 'Entity', name: 'someName', ancestor : { entity: 'ParentEntity', id: 15, 'ancestor' : {entity: 'GrandParentEntity', name: 'someOldName'}}});
+		});
+		QUnit.test("Create a key from raw data.", function(assert) {
+			var key = ds.Key.raw('raw-data');
+			assert.deepEqual(key.toJSON(), {raw : 'raw-data'});
 		});
 	});
   </script>

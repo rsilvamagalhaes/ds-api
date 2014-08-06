@@ -1,4 +1,43 @@
 define(['jquery'], function($) {
+	function Key() {
+		var _this = this;
+		if (arguments.length == 1) {
+			this.raw = arguments[0];
+		} else {
+			var key = {};
+			_this.key = key;
+			var entity, id;
+			for (var idx = arguments.length - 1; idx > 0; idx = idx - 2) {
+				var entity = arguments[idx - 1]
+				var id = arguments[idx];
+				key.entity = entity;
+				if (typeof id == 'string') {
+					key['name'] = id;
+				} else 	if (typeof id == 'number') {
+					key['id'] = id;
+				}
+				console.info('_this.key', _this.key, idx);
+				if (idx > 1) {
+					var ancestor = {};
+					key.ancestor = ancestor;
+					key = ancestor;
+				}
+			};
+		}
+		this.toJSON = function() {
+			if (this.raw) {
+				var json = {};
+				toSafeJSON('raw', this.raw, json);
+				return json;
+			} else {
+				return $.extend(this.key, {});
+			}
+		}
+	}
+	Key.raw = function(rawData) {
+		var key = new Key(rawData);
+		return key;
+	}
 	function Query(kind) {
 
 		var EQ_FILTER = '=';
@@ -9,10 +48,12 @@ define(['jquery'], function($) {
 		var LT_FILTER = '<';
 		var IN_FILTER = 'in';
 
+		var ASC_DIRECTION = 'ASC';
+		var DESC_DIRECTION = 'DESC';
+
 		var _this = this;
 		this.kind = kind;
 		this.filters = [];
-		this.order = [];
 		this.select = function() {
 			this.fields = $.makeArray(arguments);
 			return this;
@@ -45,28 +86,36 @@ define(['jquery'], function($) {
 			return _this;
 		}
 		this.order = function() {
-			this.order = $.makeArray(arguments);
+			this.ordering = {direction : ASC_DIRECTION, fields : $.makeArray(arguments)};
+			return this;
+		}
+		this.orderDesc = function() {
+			this.ordering = {direction : DESC_DIRECTION, fields : $.makeArray(arguments)};
+			return this;
+		}
+		this.limit = function(lim) {
+			this.lim = lim;
 			return this;
 		}
 		this.toJSON = function() {
 			var json = {};
 			toSafeJSON('kind', this.kind, json);
 			toSafeJSON('fields', this.fields, json);
+			toSafeJSON('order', this.ordering, json);
+			toSafeJSON('limit', this.lim, json);
 			if (this.filters.length > 0) {
-				json.filters = this.filters;
-			}
-			if (this.order.length > 0) {
-				json.order = this.order;
+				json.filters = this.filters;	
 			}
 			return json;
 		}
-		var toSafeJSON = function(key, obj, json) {
-			if (obj) {
-				json[key] = obj;
-			}
+	}
+	// utils
+	var toSafeJSON = function(key, obj, json) {
+		if (obj) {
+			json[key] = obj;
 		}
 	}
-	return {Query : Query}
+	return {Query : Query, Key: Key}
 });
 
 
