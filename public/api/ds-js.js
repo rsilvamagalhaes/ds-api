@@ -164,6 +164,16 @@ define(['jquery'], function($) {
 				});
 				return jqXHR;
 			}
+			jqXHR.get = function(cb) {
+				jqXHR.done(function(json) {
+					var result = null;
+					if (json.result.length > 0) {
+						result = json.result[0];
+					}
+					cb.call(_this, result);
+				});
+				return jqXHR;
+			}
 			return jqXHR;
 		}
 		this.execute = function() {

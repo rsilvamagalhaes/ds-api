@@ -140,6 +140,7 @@
 			query.url = 'result.json';
 			var results = [];
 			var resultList;
+			var result;
 			var jqXHR = query.execute();
 			jqXHR.iterate(function(result) {
 				results.push(result);
@@ -147,10 +148,14 @@
 			jqXHR.list(function(_resultList) {
 				resultList = _resultList;
 			});
+			jqXHR.get(function(_result) {
+				result = _result;
+			});
 			jqXHR.done(function() {
 				QUnit.start();
 				assert.equal(resultList.length, results.length);
 				assert.deepEqual(resultList[0], results[0]);
+				assert.deepEqual(resultList[0], result);
 			}).fail(function(obj, b, e) {
 				QUnit.start();
 				console.info(e.toString());
