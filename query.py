@@ -4,7 +4,7 @@ import sys
 bottle = Bottle()
 
 
-def createGeneric(kind):
+def create_generic_model(kind):
 
    class GenericModel(ndb.Expando):
         @classmethod
@@ -23,7 +23,7 @@ def toJSON(query_result):
         for property in model._properties.keys():
             value = getattr(model, property)
             item[property] = value
-            
+
         list.append(item)
 
     return {'result': list}
@@ -45,7 +45,7 @@ def put():
         ]
     }
 
-    p = createGeneric(json['kind'])
+    p = create_generic_model(json['kind'])
 
     for field in json['fields']:
         setattr(p, field['field'], field['value'])
@@ -67,14 +67,11 @@ def get():
     }
 
 
-    try:
-        user = createGeneric(json['kind'])
-        query = user.query()
-        for filter in json['filters']:
-            query = query.filter(ndb.GenericProperty(filter['field']) == filter['value'])
+    user = create_generic_model(json['kind'])
+    query = user.query()
+    for filter in json['filters']:
+        query = query.filter(ndb.GenericProperty(filter['field']) == filter['value'])
 
-        return toJSON(query.fetch())
+    return toJSON(query.fetch())
 
-    except:
-        print sys.exc_info()
 
