@@ -12,6 +12,17 @@ indexes:
 
 - kind: User
   properties:
+  - name: nome
+  - name: apelido
+
+- kind: User
+  properties:
+  - name: nome
+  - name: apelido
+    direction: desc
+
+- kind: User
+  properties:
   - name: senha
   - name: nome
 
