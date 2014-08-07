@@ -6,11 +6,11 @@ define(['jquery'], function($) {
 		} else {
 			var key = {};
 			_this.key = key;
-			var entity, id;
+			var kind, id;
 			for (var idx = arguments.length - 1; idx > 0; idx = idx - 2) {
-				var entity = arguments[idx - 1]
+				var kind = arguments[idx - 1]
 				var id = arguments[idx];
-				key.entity = entity;
+				key.kind = kind;
 				if (typeof id == 'string') {
 					key['name'] = id;
 				} else 	if (typeof id == 'number') {
@@ -59,6 +59,7 @@ define(['jquery'], function($) {
 		this.url = API_URL;
 		this.kind = kind;
 		this.filters = [];
+		this.ordering = [];
 		this.cursors = [];
 		this.select = function() {
 			this.fields = $.makeArray(arguments);
@@ -101,11 +102,15 @@ define(['jquery'], function($) {
 			return _this;
 		}
 		this.order = function() {
-			this.ordering = {direction : ASC_DIRECTION, fields : $.makeArray(arguments)};
+			for (var i = 0; i < arguments.length; i++) {
+				this.ordering.push({field : arguments[i], direction: ASC_DIRECTION});
+			}
 			return this;
 		}
 		this.orderDesc = function() {
-			this.ordering = {direction : DESC_DIRECTION, fields : $.makeArray(arguments)};
+			for (var i = 0; i < arguments.length; i++) {
+				this.ordering.push({field : arguments[i], direction: DESC_DIRECTION});
+			}
 			return this;
 		}
 		this.limit = function(lim) {
@@ -124,7 +129,6 @@ define(['jquery'], function($) {
 			var json = {};
 			toSafeJSON('kind', this.kind, json);
 			toSafeJSON('fields', this.fields, json);
-			toSafeJSON('order', this.ordering, json);
 			toSafeJSON('limit', this.lim, json);
 			if (this.ancestorKey) {
 				json.ancestor = this.ancestorKey.toJSON();
@@ -137,6 +141,9 @@ define(['jquery'], function($) {
 			}
 			if (this.cursors.length > 0) {
 				json.cursor = this.cursors[this.cursors.length - 1];
+			}
+			if (this.ordering.length > 0) {
+				json.order = this.ordering;
 			}
 			return json;
 		}
@@ -161,6 +168,16 @@ define(['jquery'], function($) {
 					for (var i = 0; i < result.length; i++) {
 						cb.call(_this, result[i]);
 					}
+				});
+				return jqXHR;
+			}
+			jqXHR.get = function(cb) {
+				jqXHR.done(function(json) {
+					var result = null;
+					if (json.result.length > 0) {
+						result = json.result[0];
+					}
+					cb.call(_this, result);
 				});
 				return jqXHR;
 			}
