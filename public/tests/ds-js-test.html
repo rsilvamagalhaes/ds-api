@@ -16,7 +16,7 @@
 	      "jquery": "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min"
 	    }
 	});
-	require(['../ds-js'], function(ds) {
+	require(['../api/ds-js'], function(ds) {
 		QUnit.module('Query tests')
 		QUnit.test("Define a kind.", function(assert) {
 			var query = new ds.Query('Kind');
@@ -145,6 +145,7 @@
 		QUnit.asyncTest("Execute a query and iterate over it's results.", function(assert) {
 			var query = new ds.Query('Kind');
 			query.url = 'result.json';
+			query.method = 'get';
 			var results = [];
 			var resultList;
 			var result;
@@ -171,6 +172,7 @@
 		QUnit.asyncTest("Execute a query and request next page with cursor.", function(assert) {
 			var query = new ds.Query('Kind');
 			query.url = 'result.json';
+			query.method = 'get';
 			var jqXHR = query.execute();
 			jqXHR = jqXHR.then(function() {
 				QUnit.start();
