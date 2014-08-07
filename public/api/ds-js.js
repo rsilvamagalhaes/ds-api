@@ -6,11 +6,11 @@ define(['jquery'], function($) {
 		} else {
 			var key = {};
 			_this.key = key;
-			var entity, id;
+			var kind, id;
 			for (var idx = arguments.length - 1; idx > 0; idx = idx - 2) {
-				var entity = arguments[idx - 1]
+				var kind = arguments[idx - 1]
 				var id = arguments[idx];
-				key.entity = entity;
+				key.kind = kind;
 				if (typeof id == 'string') {
 					key['name'] = id;
 				} else 	if (typeof id == 'number') {
