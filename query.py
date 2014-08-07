@@ -60,9 +60,9 @@ def get():
     json = {
         'kind': 'User',
         'filters': [{
-            'field': 'nome',
+            'field': 'senha',
             'operator': '=',
-            'value': 'Guilherme'
+            'value': '123456'
         }],
         'order' : {
             'direction': 'DESC',
@@ -73,8 +73,9 @@ def get():
 
     user = create_generic_model(json['kind'])
     query = user.query()
-    for filter in json['filters']:
-        query = do_query_based_on_operator(filter, query)
+    if json['filters']:
+        for filter in json['filters']:
+            query = do_query_based_on_operator(filter, query)
 
 
     if json['order']:
