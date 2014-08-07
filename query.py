@@ -83,8 +83,6 @@ def get():
     kind = json['kind']
     user = create_generic_model(kind)
 
-    json_result = {}
-
     #key methods
     if 'name' in json or 'id' in json:
         json_result = get_results_from_key(kind, json)
