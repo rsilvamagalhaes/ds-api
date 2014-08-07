@@ -36,11 +36,11 @@ def put():
         'fields': [
             {
                 'field': 'nome',
-                'value': 'Guilherme'
+                'value': 'Zaratrusta'
             },
             {
                 'field': 'senha',
-                'value': '123456'
+                'value': '9999'
             }
         ]
     }
@@ -63,15 +63,65 @@ def get():
             'field': 'nome',
             'operator': '=',
             'value': 'Guilherme'
-        }]
+        }],
+        'order' : {
+            'direction': 'DESC',
+            'fields' : ['nome']
+        }
     }
 
 
     user = create_generic_model(json['kind'])
     query = user.query()
     for filter in json['filters']:
-        query = query.filter(ndb.GenericProperty(filter['field']) == filter['value'])
+        query = do_query_based_on_operator(filter, query)
+
+
+    if json['order']:
+        query = order_query(json['order'], query)
 
     return toJSON(query.fetch())
+
+
+def order_query(order_json, query):
+    direction =  order_json['direction']
+    for field in order_json['fields']:
+        if direction == 'ASC':
+            query = query.order(ndb.GenericProperty(field))
+        else:
+            query = query.order(-ndb.GenericProperty(field))
+
+    return query
+
+def do_query_based_on_operator(filter ,query):
+    if filter['operator'] == '=':
+        return query.filter(ndb.GenericProperty(filter['field']) == filter['value'])
+    else:
+        if filter['operator'] == '>':
+            return query.filter(ndb.GenericProperty(filter['field']) > filter['value'])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
