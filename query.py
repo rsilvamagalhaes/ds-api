@@ -1,13 +1,19 @@
 from google.appengine.ext import ndb
 import entity as entity_api
-from bottle import Bottle
-bottle = Bottle()
+import sys
+
+def __to_json(query_result):
+    result_json = []
+    for model in query_result:
+        item = model_to_json(model)
+        result_json.append(item)
+
+    return result_json
 
 
 def execute(json):
     kind = json['kind']
 
-    #Key methods
     if 'name' in json or 'id' in json:
         json_result = get_results_from_key(kind, json)
 
@@ -31,21 +37,6 @@ def execute(json):
 
     return {'result': [json_result]}
 
-
-def __to_json(query_result):
-    result_json = []
-
-    for model in query_result:
-        item = {}
-        for prop in model._properties.keys():
-            value = getattr(model, prop)
-            item[prop] = value
-
-        result_json.append(item)
-
-    return result_json
-
-
 def model_to_json(model):
     item = {}
     if model:
@@ -58,20 +49,40 @@ def model_to_json(model):
 
 
 def get_results_from_key(kind, json):
+    identifier = get_identifier_from_ancestor(json)
+
+    ancestors = []
+    ancestors.append(kind)
+    ancestors.append(identifier)
+
+    if 'ancestor' in json:
+        ancestors = get_ancestors(json, ancestors)
+
+    key = ndb.Key(flat=ancestors)
+    return model_to_json(key.get())
+
+
+def get_identifier_from_ancestor(json):
     if 'name' in json:
         identifier = json['name']
 
     if 'id' in json:
-        identifier = json['id']
+        identifier = long(json['id'])
 
-    key = ndb.Key(kind, identifier)
+    return identifier
 
-    if 'ancestor' in json:
-        ancestor_kind = json['ancestor']['kind']
-        ancestor_id = json['ancestor']['id']
-        key = ndb.Key(kind, identifier, ancestor_kind, ancestor_id)
 
-    return model_to_json(key.get())
+def get_ancestors(json, ancestors):
+    while 'ancestor' in json:
+        ancestor_kind = json['kind']
+        identifier = get_identifier_from_ancestor(json)
+
+        ancestors.append(ancestor_kind)
+        ancestors.append(identifier)
+
+        json = json['ancestor']
+
+    return ancestors
 
 
 def __order_query(order_json, query):
