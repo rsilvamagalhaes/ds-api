@@ -54,9 +54,11 @@ define(['jquery'], function($) {
 		var KEY_TYPE = 'key'
 
 		var API_URL = '/api/query';
+		var API_METHOD = 'post';
 
 		var _this = this;
 		this.url = API_URL;
+		this.method = API_METHOD;
 		this.kind = kind;
 		this.filters = [];
 		this.ordering = [];
@@ -150,7 +152,7 @@ define(['jquery'], function($) {
 		var fetch = function() {
 			var jqXHR = $.ajax({
 				dataType: "json",
-				type: 'get',
+				type: _this.method,
 				url: _this.url,
 				data : JSON.stringify(_this.toJSON())
 			}).done(function(json) {
