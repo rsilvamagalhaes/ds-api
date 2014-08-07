@@ -6,16 +6,14 @@ bottle = Bottle()
 
 def create_generic_model(kind):
 
-   class GenericModel(ndb.Expando):
+    class GenericModel(ndb.Expando):
         @classmethod
         def _get_kind(cls):
             return kind
 
-   return GenericModel()
+    return GenericModel()
 
 
-#[GenericModel(key=Key('User', 5838406743490560), nome='Guilherme', senha='123456'),
-#  GenericModel(key=Key('User', 6192449487634432), nome='Guilherme', senha='123456')]
 def toJSON(query_result):
     list = []
     for model in query_result:
@@ -67,21 +65,26 @@ def get():
         'order' : {
             'direction': 'DESC',
             'fields' : ['nome']
-        }
+        },
+        'limit': 1
     }
 
 
     user = create_generic_model(json['kind'])
     query = user.query()
-    if json['filters']:
+    if 'filters' in json:
         for filter in json['filters']:
             query = do_query_based_on_operator(filter, query)
 
 
-    if json['order']:
+    if 'order' in json:
         query = order_query(json['order'], query)
 
-    return toJSON(query.fetch())
+    limit = None
+    if 'limit' in json:
+        limit = int(json['limit'])
+
+    return toJSON(query.fetch(limit))
 
 
 def order_query(order_json, query):
@@ -93,6 +96,7 @@ def order_query(order_json, query):
             query = query.order(-ndb.GenericProperty(field))
 
     return query
+
 
 def do_query_based_on_operator(filter ,query):
     if filter['operator'] == '=':
