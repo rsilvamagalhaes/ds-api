@@ -32,6 +32,7 @@ def model_to_json(model):
             item['field'] = property
             item['value'] = value
             item['type'] = value.__class__.__name__
+
     return item
 
 @bottle.get('/query/put')
@@ -80,7 +81,7 @@ def get():
     json = {
         'kind': 'User',
         'id': 4785074604081152,
-         'ancestor' : {'kind': 'ParentEntity', 'id': 15}
+        'ancestor' : {'kind': 'ParentEntity', 'id': 15, 'ancestor' : {'kind': 'GrandParentEntity', 'name': 'someOldName'}}
     }
 
     kind = json['kind']
@@ -110,7 +111,6 @@ def get():
     return {'result': [json_result]}
 
 
-#{kind: 'Entity', name: 'someName', ancestor : {kind: 'ParentEntity', id: 15}}
 def get_results_from_key(kind, json):
     if 'name' in json:
         identifier = json['name']
@@ -118,14 +118,34 @@ def get_results_from_key(kind, json):
     if 'id' in json:
         identifier = json['id']
 
-    key = ndb.Key(kind, identifier)
+    ancestors = []
+    ancestors.append(kind)
+    ancestors.append(identifier)
 
     if 'ancestor' in json:
-        ancestor_kind = json['ancestor']['kind']
-        ancestor_id = json['ancestor']['id']
-        key = ndb.Key(kind, identifier, ancestor_kind, ancestor_id)
+        ancestors = get_ancestors(json, ancestors)
 
+    key = ndb.Key(flat=ancestors)
     return model_to_json(key.get())
+
+
+def get_ancestors(json, ancestors):
+
+    while 'ancestor' in json:
+        ancestor_kind = json['kind']
+
+        if 'id' in json:
+            identifier = json['id']
+
+        if 'name' in json:
+            identifier = json['name']
+
+        json = json['ancestor']
+
+        ancestors.append(ancestor_kind)
+        ancestors.append(identifier)
+
+    return ancestors
 
 
 def order_query(order_json, query):
