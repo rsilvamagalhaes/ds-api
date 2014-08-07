@@ -21,10 +21,12 @@ def toJSON(query_result):
     for model in query_result:
         item = {}
         for property in model._properties.keys():
-            item = getattr(model, property)
-            list.append(item)
+            value = getattr(model, property)
+            item[property] = value
             
-    return list
+        list.append(item)
+
+    return {'result': list}
 
 
 @bottle.get('/query/put')
