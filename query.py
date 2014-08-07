@@ -26,11 +26,12 @@ def toJSON(query_result):
 
 def model_to_json(model):
     item = {}
-    for property in model._properties.keys():
-        value = getattr(model, property)
-        item['field'] = property
-        item['value'] = value
-        item['type'] = value.__class__.__name__
+    if model:
+        for property in model._properties.keys():
+            value = getattr(model, property)
+            item['field'] = property
+            item['value'] = value
+            item['type'] = value.__class__.__name__
     return item
 
 @bottle.get('/query/put')
@@ -58,6 +59,7 @@ def put():
 
     return 'OK'
 
+
 @bottle.get('/query/get')
 def get():
 
@@ -75,10 +77,11 @@ def get():
         'limit': 1
     }
 
-    #json = {
-    #    'kind': 'User',
-    #    'id': 4785074604081152
-    #}
+    json = {
+        'kind': 'User',
+        'id': 4785074604081152,
+         'ancestor' : {'kind': 'ParentEntity', 'id': 15}
+    }
 
     kind = json['kind']
     user = create_generic_model(kind)
@@ -107,12 +110,20 @@ def get():
     return {'result': [json_result]}
 
 
+#{kind: 'Entity', name: 'someName', ancestor : {kind: 'ParentEntity', id: 15}}
 def get_results_from_key(kind, json):
     if 'name' in json:
-        key = ndb.Key(kind, json['name'])
+        identifier = json['name']
 
     if 'id' in json:
-        key = ndb.Key(kind, json['id'])
+        identifier = json['id']
+
+    key = ndb.Key(kind, identifier)
+
+    if 'ancestor' in json:
+        ancestor_kind = json['ancestor']['kind']
+        ancestor_id = json['ancestor']['id']
+        key = ndb.Key(kind, identifier, ancestor_kind, ancestor_id)
 
     return model_to_json(key.get())
 
