@@ -6,11 +6,8 @@ threadsafe: no
 
 handlers:
 
-- url: /h/.*
-  script: hello.bottle
+- url: /api/query
+  script: query_controller.bottle
 
-- url: /query/.*
-  script: query.bottle
-
-- url: /p
-  static_dir: public
+- url: /api/entity
+  script: entity_controller.bottle

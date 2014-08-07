@@ -1,122 +1,55 @@
 from google.appengine.ext import ndb
-from bottle import Bottle
+import entity as entity_api
 import sys
 
-bottle = Bottle()
-
-
-def create_generic_model(kind):
-
-    class GenericModel(ndb.Expando):
-        @classmethod
-        def _get_kind(cls):
-            return kind
-
-    return GenericModel()
-
-
-def toJSON(query_result):
-    list = []
+def __to_json(query_result):
+    result_json = []
     for model in query_result:
         item = model_to_json(model)
-        list.append(item)
+        result_json.append(item)
 
-    return list
-
-
-def model_to_json(model):
-    item = {}
-    if model:
-        for property in model._properties.keys():
-            value = getattr(model, property)
-            item['field'] = property
-            item['value'] = value
-            item['type'] = value.__class__.__name__
-
-    return item
-
-@bottle.get('/query/put')
-def put():
-    json = {
-        'kind': 'User',
-        'fields': [
-            {
-                'field': 'nome',
-                'value': 'Zaratrusta'
-            },
-            {
-                'field': 'senha',
-                'value': '9999'
-            }
-        ]
-    }
-
-    p = create_generic_model(json['kind'])
-
-    for field in json['fields']:
-        setattr(p, field['field'], field['value'])
-
-    p.put()
-
-    return 'OK'
+    return result_json
 
 
-@bottle.get('/query/get')
-def get():
-
-    json = {
-        'kind': 'User',
-        'filters': [{
-            'field': 'senha',
-            'operator': '=',
-            'value': '123456'
-        }],
-        'order' : {
-            'direction': 'DESC',
-            'fields' : ['nome']
-        },
-        'limit': 1
-    }
-
-    json = {
-        'kind': 'User',
-        'id': 4785074604081152,
-        'ancestor' : {'kind': 'ParentEntity', 'id': 15, 'ancestor' : {'kind': 'GrandParentEntity', 'name': 'someOldName'}}
-    }
-
+def execute(json):
     kind = json['kind']
-    user = create_generic_model(kind)
 
-    #key methods
     if 'name' in json or 'id' in json:
         json_result = get_results_from_key(kind, json)
 
     else:
-        #query methods
-        query = user.query()
+        entity = entity_api.create_generic_model(kind)
+        query = entity.query()
 
         if 'filters' in json:
-            for filter in json['filters']:
-                query = do_query_based_on_operator(filter, query)
+            for query_filter in json['filters']:
+                query = __do_query_based_on_operator(query_filter, query)
 
         if 'order' in json:
-            query = order_query(json['order'], query)
+            query = __order_query(json['order'], query)
 
         limit = None
         if 'limit' in json:
             limit = int(json['limit'])
 
-        json_result = toJSON(query.fetch(limit))
+        fetch = query.fetch(limit)
+        json_result = __to_json(fetch)
 
     return {'result': [json_result]}
 
+def model_to_json(model):
+    item = {}
+    if model:
+        for prop in model._properties.keys():
+            value = getattr(model, prop)
+            item['field'] = prop
+            item['value'] = value
+            item['type'] = value.__class__.__name__
+    return item
+
 
 def get_results_from_key(kind, json):
-    if 'name' in json:
-        identifier = json['name']
-
-    if 'id' in json:
-        identifier = json['id']
+    identifier = get_identifier_from_ancestor(json)
 
     ancestors = []
     ancestors.append(kind)
@@ -129,65 +62,46 @@ def get_results_from_key(kind, json):
     return model_to_json(key.get())
 
 
-def get_ancestors(json, ancestors):
+def get_identifier_from_ancestor(json):
+    if 'name' in json:
+        identifier = json['name']
 
+    if 'id' in json:
+        identifier = long(json['id'])
+
+    return identifier
+
+
+def get_ancestors(json, ancestors):
     while 'ancestor' in json:
         ancestor_kind = json['kind']
-
-        if 'id' in json:
-            identifier = json['id']
-
-        if 'name' in json:
-            identifier = json['name']
-
-        json = json['ancestor']
+        identifier = get_identifier_from_ancestor(json)
 
         ancestors.append(ancestor_kind)
         ancestors.append(identifier)
 
+        json = json['ancestor']
+
     return ancestors
 
 
-def order_query(order_json, query):
-    direction =  order_json['direction']
-    for field in order_json['fields']:
-        if direction == 'ASC':
-            query = query.order(ndb.GenericProperty(field))
+def __order_query(order_json, query):
+    for order in order_json:
+        order_direction = order['direction']
+        order_field = order['field']
+
+        if order_direction == 'ASC':
+            query = query.order(ndb.GenericProperty(order_field))
         else:
-            query = query.order(-ndb.GenericProperty(field))
+            query = query.order(-ndb.GenericProperty(order_field))
 
     return query
 
 
-def do_query_based_on_operator(filter ,query):
-    if filter['operator'] == '=':
-        return query.filter(ndb.GenericProperty(filter['field']) == filter['value'])
-    else:
-        if filter['operator'] == '>':
-            return query.filter(ndb.GenericProperty(filter['field']) > filter['value'])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def __do_query_based_on_operator(query_filter, query):
+    if query_filter['operator'] == '=':
+        return query.filter(ndb.GenericProperty(query_filter['field']) == query_filter['value'])
+    elif query_filter['operator'] == '>':
+        return query.filter(ndb.GenericProperty(query_filter['field']) > query_filter['value'])
+    elif query_filter['operator'] == 'in':
+        return query.filter(ndb.GenericProperty(query_filter['field']).IN(query_filter['value']))
