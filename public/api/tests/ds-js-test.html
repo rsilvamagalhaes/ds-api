@@ -71,17 +71,24 @@
 			assert.deepEqual(query.filters, [{field: 'fieldA', operator: 'in', value: [5, 4]}]);
 			assert.deepEqual(query.toJSON(), {kind: 'Kind', filters: [{field: 'fieldA', operator: 'in', value: [5, 4]}]});
 		});
-		QUnit.test("Create an order by clause.", function(assert) {
+		QUnit.test("Create an order-by clause.", function(assert) {
 			var query = new ds.Query('Kind');
 			assert.deepEqual(query.order('fieldA', 'fieldB'), query);
-			assert.deepEqual(query.ordering, {direction: 'ASC' ,fields : ['fieldA', 'fieldB']});
-			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: {direction: 'ASC' ,fields : ['fieldA', 'fieldB']}});
+			assert.deepEqual(query.ordering, [{field : 'fieldA', direction : 'ASC'}, {field : 'fieldB', direction : 'ASC'}]);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: [{field : 'fieldA', direction : 'ASC'}, {field : 'fieldB', direction : 'ASC'}]});
 		});
-		QUnit.test("Create an order by (descending) clause.", function(assert) {
+		QUnit.test("Create an order-by (descending) clause.", function(assert) {
 			var query = new ds.Query('Kind');
 			assert.deepEqual(query.orderDesc('fieldA', 'fieldB'), query);
-			assert.deepEqual(query.ordering, {direction: 'DESC' ,fields : ['fieldA', 'fieldB']});
-			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: {direction: 'DESC' ,fields : ['fieldA', 'fieldB']}});
+			assert.deepEqual(query.ordering, [{field : 'fieldA', direction : 'DESC'}, {field : 'fieldB', direction : 'DESC'}]);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: [{field : 'fieldA', direction : 'DESC'}, {field : 'fieldB', direction : 'DESC'}]});
+		});
+		QUnit.test("Create an order-by combining directions clause.", function(assert) {
+			var query = new ds.Query('Kind');
+			assert.deepEqual(query.order('fieldA'), query);
+			assert.deepEqual(query.orderDesc('fieldB'), query);
+			assert.deepEqual(query.ordering, [{field : 'fieldA', direction : 'ASC'}, {field : 'fieldB', direction : 'DESC'}]);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: [{field : 'fieldA', direction : 'ASC'}, {field : 'fieldB', direction : 'DESC'}]});
 		});
 		QUnit.test("Create a limit clause.", function(assert) {
 			var query = new ds.Query('Kind');
