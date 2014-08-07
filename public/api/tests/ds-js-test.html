@@ -71,17 +71,24 @@
 			assert.deepEqual(query.filters, [{field: 'fieldA', operator: 'in', value: [5, 4]}]);
 			assert.deepEqual(query.toJSON(), {kind: 'Kind', filters: [{field: 'fieldA', operator: 'in', value: [5, 4]}]});
 		});
-		QUnit.test("Create an order by clause.", function(assert) {
+		QUnit.test("Create an order-by clause.", function(assert) {
 			var query = new ds.Query('Kind');
 			assert.deepEqual(query.order('fieldA', 'fieldB'), query);
-			assert.deepEqual(query.ordering, {direction: 'ASC' ,fields : ['fieldA', 'fieldB']});
-			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: {direction: 'ASC' ,fields : ['fieldA', 'fieldB']}});
+			assert.deepEqual(query.ordering, [{field : 'fieldA', direction : 'ASC'}, {field : 'fieldB', direction : 'ASC'}]);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: [{field : 'fieldA', direction : 'ASC'}, {field : 'fieldB', direction : 'ASC'}]});
 		});
-		QUnit.test("Create an order by (descending) clause.", function(assert) {
+		QUnit.test("Create an order-by (descending) clause.", function(assert) {
 			var query = new ds.Query('Kind');
 			assert.deepEqual(query.orderDesc('fieldA', 'fieldB'), query);
-			assert.deepEqual(query.ordering, {direction: 'DESC' ,fields : ['fieldA', 'fieldB']});
-			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: {direction: 'DESC' ,fields : ['fieldA', 'fieldB']}});
+			assert.deepEqual(query.ordering, [{field : 'fieldA', direction : 'DESC'}, {field : 'fieldB', direction : 'DESC'}]);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: [{field : 'fieldA', direction : 'DESC'}, {field : 'fieldB', direction : 'DESC'}]});
+		});
+		QUnit.test("Create an order-by combining directions clause.", function(assert) {
+			var query = new ds.Query('Kind');
+			assert.deepEqual(query.order('fieldA'), query);
+			assert.deepEqual(query.orderDesc('fieldB'), query);
+			assert.deepEqual(query.ordering, [{field : 'fieldA', direction : 'ASC'}, {field : 'fieldB', direction : 'DESC'}]);
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', order: [{field : 'fieldA', direction : 'ASC'}, {field : 'fieldB', direction : 'DESC'}]});
 		});
 		QUnit.test("Create a limit clause.", function(assert) {
 			var query = new ds.Query('Kind');
@@ -94,14 +101,14 @@
 			var key = new ds.Key('ParentEntity', 15);
 			assert.deepEqual(query.ancestor(key), query);
 			assert.deepEqual(query.ancestorKey, key);
-			assert.deepEqual(query.toJSON(), {kind: 'Kind', ancestor: {entity: 'ParentEntity', id: 15}});
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', ancestor: {kind: 'ParentEntity', id: 15}});
 		});
 		QUnit.test("Create an key clause.", function(assert) {
 			var query = new ds.Query('Kind');
-			var key = new ds.Key('Entity', 'someName');
+			var key = new ds.Key('Kind', 'someName');
 			assert.deepEqual(query.key(key), query);
 			assert.deepEqual(query.queryKey, key);
-			assert.deepEqual(query.toJSON(), {kind: 'Kind', key: {entity: 'Entity', name: 'someName'}});
+			assert.deepEqual(query.toJSON(), {kind: 'Kind', key: {kind: 'Kind', name: 'someName'}});
 		});
 		QUnit.test("Create a filter with a date parameter.", function(assert) {
 			var query = new ds.Query('Kind');
@@ -120,15 +127,15 @@
 		QUnit.module('Key tests');
 		QUnit.test("Create a key.", function(assert) {
 			var key = new ds.Key('Entity', 'someName');
-			assert.deepEqual(key.toJSON(), {entity: 'Entity', name: 'someName'});
+			assert.deepEqual(key.toJSON(), {kind: 'Entity', name: 'someName'});
 		});
 		QUnit.test("Create a key with a parent.", function(assert) {
 			var key = new ds.Key('ParentEntity', 15, 'Entity', 'someName');
-			assert.deepEqual(key.toJSON(), {entity: 'Entity', name: 'someName', ancestor : {entity: 'ParentEntity', id: 15}});
+			assert.deepEqual(key.toJSON(), {kind: 'Entity', name: 'someName', ancestor : {kind: 'ParentEntity', id: 15}});
 		});
 		QUnit.test("Create a key with more than one parent.", function(assert) {
 			var key = new ds.Key('GrandParentEntity', 'someOldName', 'ParentEntity', 15, 'Entity', 'someName');
-			assert.deepEqual(key.toJSON(), {entity: 'Entity', name: 'someName', ancestor : {entity: 'ParentEntity', id: 15, 'ancestor' : {entity: 'GrandParentEntity', name: 'someOldName'}}});
+			assert.deepEqual(key.toJSON(), {kind: 'Entity', name: 'someName', ancestor : {kind: 'ParentEntity', id: 15, 'ancestor' : {kind: 'GrandParentEntity', name: 'someOldName'}}});
 		});
 		QUnit.test("Create a key from raw data.", function(assert) {
 			var key = ds.Key.raw('raw-data');
@@ -140,6 +147,7 @@
 			query.url = 'result.json';
 			var results = [];
 			var resultList;
+			var result;
 			var jqXHR = query.execute();
 			jqXHR.iterate(function(result) {
 				results.push(result);
@@ -147,10 +155,14 @@
 			jqXHR.list(function(_resultList) {
 				resultList = _resultList;
 			});
+			jqXHR.get(function(_result) {
+				result = _result;
+			});
 			jqXHR.done(function() {
 				QUnit.start();
 				assert.equal(resultList.length, results.length);
 				assert.deepEqual(resultList[0], results[0]);
+				assert.deepEqual(resultList[0], result);
 			}).fail(function(obj, b, e) {
 				QUnit.start();
 				console.info(e.toString());
