@@ -14,7 +14,7 @@ def __to_json(query_result):
 def execute(json):
     kind = json['kind']
 
-    if 'name' in json or 'id' in json:
+    if ('name' in json) or ('id' in json) or ('ancestor' in json):
         json_result = get_results_from_key(kind, json)
 
     else:
@@ -49,10 +49,11 @@ def model_to_json(model):
 
 
 def get_results_from_key(kind, json):
-    identifier = get_identifier_from_ancestor(json)
 
     ancestors = []
     ancestors.append(kind)
+
+    identifier = get_identifier_from_ancestor(json)
     ancestors.append(identifier)
 
     if 'ancestor' in json:
@@ -63,6 +64,8 @@ def get_results_from_key(kind, json):
 
 
 def get_identifier_from_ancestor(json):
+    identifier = None
+
     if 'name' in json:
         identifier = json['name']
 
