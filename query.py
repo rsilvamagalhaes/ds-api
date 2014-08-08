@@ -2,6 +2,7 @@ from google.appengine.ext import ndb
 import entity as entity_api
 import sys
 
+
 def __to_json(query_result):
     result_json = []
     for model in query_result:
@@ -37,15 +38,20 @@ def execute(json):
 
     return {'result': [json_result]}
 
+
 def model_to_json(model):
-    item = {}
+    fields = []
     if model:
         for prop in model._properties.keys():
+            item = {}
             value = getattr(model, prop)
             item['field'] = prop
             item['value'] = value
-            item['type'] = value.__class__.__name__
-    return item
+            item['type']  = value.__class__.__name__
+
+            fields.append(item)
+
+    return fields
 
 
 def get_results_from_key(kind, json):
@@ -102,9 +108,17 @@ def __order_query(order_json, query):
 
 
 def __do_query_based_on_operator(query_filter, query):
-    if query_filter['operator'] == '=':
+    operator = query_filter['operator']
+    print operator
+    if operator == '=':
         return query.filter(ndb.GenericProperty(query_filter['field']) == query_filter['value'])
-    elif query_filter['operator'] == '>':
-        return query.filter(ndb.GenericProperty(query_filter['field']) > query_filter['value'])
-    elif query_filter['operator'] == 'in':
+    elif operator == 'in':
         return query.filter(ndb.GenericProperty(query_filter['field']).IN(query_filter['value']))
+    elif operator == '>':
+        return query.filter(ndb.GenericProperty(query_filter['field']) > query_filter['value'])
+    elif operator == '>=':
+        return query.filter(ndb.GenericProperty(query_filter['field']) >= query_filter['value'])
+    elif operator == '<':
+        return query.filter(ndb.GenericProperty(query_filter['field']) < query_filter['value'])
+    elif operator == '<=':
+        return query.filter(ndb.GenericProperty(query_filter['field']) <= query_filter['value'])
