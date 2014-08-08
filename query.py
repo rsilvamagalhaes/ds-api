@@ -45,7 +45,7 @@ def model_to_json(model):
             item = {}
             value = getattr(model, prop)
             item['field'] = prop
-            item['value'] = value
+            item['value'] = entity_api.to_filter_type(value)
             item['type'] = value.__class__.__name__
 
             fields.append(item)
@@ -107,8 +107,14 @@ def __order_query(order_json, query):
 
 def __do_query_based_on_operator(query_filter, query):
     filter_field = query_filter['field']
-    filter_field_type = query_filter['type']
+
+    if 'type' in query_filter:
+        filter_field_type = query_filter['type']
+    else:
+        filter_field_type = None
+
     filter_value = entity_api.from_filter_type(query_filter['value'], filter_field_type)
+
     operator = query_filter['operator']
 
     if operator == '=':

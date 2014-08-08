@@ -11,8 +11,5 @@ def error404():
 
 @bottle.post('/api/query')
 def do_query():
-    try:
-        result_json = query_entity.execute(request.json)
-        return result_json
-    except:
-        print sys.exc_info()
+    result_json = query_entity.execute(request.json)
+    return result_json
