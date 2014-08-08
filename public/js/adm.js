@@ -9,7 +9,6 @@ define(['jquery', 'ds-js'], function($, ds) {
 		this.bindEvents = function(executeCB) {
 			this.el.on('click', '.execute-query', executeCB);
 			this.el.on('keypress', '.query-text', function(evt) {
-				console.info('event.which', evt.which, evt.ctrlKey, evt.which === 13 && evt.ctrlKey);
 				if (evt.which === 10) {
 					executeCB.call();
 				}
@@ -39,27 +38,33 @@ define(['jquery', 'ds-js'], function($, ds) {
 		this.header = this.el.find('table thead tr:eq(0)');
 		this.tbody = this.el.find('table tbody');
 		
+		this.hidePage = function(index){
+			this.tbody.find("tr.page" + index).hide();
+		}
+
 		this.setQueryTitle = function(title) {
 			this.el.find('h1').html(title);
 		}
-		this.addHeader = function(fieldName) {
-			this.header.append('<th>' + fieldName + '</th>')
+		this.setHeaders = function(numOfFields) {
+			var headers = [];
+			for (var i = 0; i < numOfFields; i++) {
+				headers.push('<th></th>');
+			}
+			this.header.html(headers.join(''));
+		};
+		this.setHeader = function(fieldName, headerIndex) {
+			this.header.find('th:eq(' + headerIndex + ')').html(fieldName);
 		}
-		this.addRow = function() {
-			this.lastRow = $('<tr></tr>').appendTo(this.tbody);
+		this.addRow = function(currentPage, numOfFields) {
+			this.lastRow = $('<tr class="page' + currentPage + '"></tr>').appendTo(this.tbody);
+			var rows = [];
+			for (var i = 0; i < numOfFields; i++) {
+				rows.push('<td>&lt;missing&gt;</td>');
+			}
+			this.lastRow.html(rows.join(''));
 		}
 		this.setValue = function(index, value) {
-			fillWithRows(index + 1);
 			this.lastRow.find('td:eq(' + index + ')').html(value);		
-		}
-		var fillWithRows = function(amount) {
-			var actual = _this.lastRow.find('td').length;
-			var missing = amount - actual;
-			if (missing > 0) {
-				for (var i = 0; i < missing; i++) {
-					_this.lastRow.append('<td></td>')
-				}
-			}
 		}
 		this.reset = function() {
 			this.tbody.html('');
@@ -77,33 +82,60 @@ define(['jquery', 'ds-js'], function($, ds) {
 		this.execute = function() {
 			this.view.reset();
 			var jqXHR = this.query.execute();
-			jqXHR.iterate(this.append);
+			jqXHR.list(processResults);
 			jqXHR.done(this.process);
+			jqXHR.iterate(this.append);
 			return jqXHR;
+		}
+		this.next = function() {
+			var jqXHR = this.query.next();
+			jqXHR.list(processResults);
+			jqXHR.iterate(this.append);
+			jqXHR.done(function() {
+				_this.view.hidePage(_this.query.getCurrentPage() - 1);
+			});
+			return jqXHR;		
 		}
 		this.process = function(result) {
 			_this.view.setQueryTitle(_this.query.kind);
 		}
 		this.append = function(result) {
-			_this.view.addRow();
+			_this.view.addRow(_this.query.getCurrentPage(), _this.headers.length);
 			for (var i = 0; i < result.length; i++) {
 				var field = result[i];
-				processHeader(field);
 				processValue(field);
+				processHeader(field);
+			}
+		}
+		var getHeaderIndex = function(fieldName) {
+			return _this.headers.indexOf(fieldName);
+		}
+		var addHeader = function(field) {
+			var fieldName = field.field;
+			if (getHeaderIndex(fieldName) < 0) {
+				_this.headers.push(fieldName);
 			}
 		}
 		var processHeader = function(field) {
 			var fieldName = field.field;
-			if (_this.headers.indexOf(fieldName) < 0) {
-				_this.headers.push(fieldName);
-				_this.view.addHeader(fieldName);
-			}
+			_this.view.setHeader(fieldName, getHeaderIndex(fieldName));
 		}
+		
 		var processValue = function(field) {
 			var fieldName = field.field;
 			var fieldValue = field.value;
 			var headerIndex = _this.headers.indexOf(fieldName);
 			_this.view.setValue(headerIndex, fieldValue);
+		}
+		var processResults = function(results) {
+			for (var i = 0; i < results.length; i++) {
+				var result = results[i];
+				for (var j = 0; j < result.length; j++) {
+					var field = result[j];
+					addHeader(field);
+				}
+			}
+			_this.view.setHeaders(_this.headers.length);
 		}
 	}
 

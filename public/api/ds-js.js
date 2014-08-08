@@ -63,6 +63,10 @@ define(['jquery'], function($) {
 		this.filters = [];
 		this.ordering = [];
 		this.cursors = [];
+		
+		this.getCurrentPage = function() {
+			return this.cursors.length;		
+		}
 		this.select = function() {
 			this.fields = $.makeArray(arguments);
 			return this;

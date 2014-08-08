@@ -3,45 +3,83 @@
 <head>
   <meta charset="utf-8">
   <title>ADM Panel Test</title>
-  <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.14.0.css">
+  <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.15.0.css">
 </head>
 <body>
-  <div id="qunit"></div>
-  <div id="qunit-fixture"></div>
-  <script src="//code.jquery.com/qunit/qunit-1.14.0.js"></script>
+  <script src="//code.jquery.com/qunit/qunit-1.15.0.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.11/require.js"></script>
   <script>
 	require.config({
 	    "paths": {
-	      "jquery": "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min"
+	      "jquery": "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min",
+		'ds-js' : '/public/api/ds-js',
+		'adm' : '/public/js/adm'
 	    }
 	});
-	require(['../js/adm', 'jquery'], function(adm, $) {
+	require(['adm', 'jquery', 'ds-js'], function(adm, $, ds) {
 		QUnit.module('ResultTableController tests');
-		QUnit.test("Test append headers", function(assert) {
-			var ctrl = new adm.ResultTableController('.query-result');	
-			var result1 = [{field : 'field1'}, {field : 'field2'}];
-			ctrl.append(result1);
-			assert.deepEqual(ctrl.headers, ['field1', 'field2']);
-			var result2 = [{field : 'field1'}, {field : 'field3'}];
-			ctrl.append(result2);
-			assert.deepEqual(ctrl.headers, ['field1', 'field2', 'field3']);
+		QUnit.asyncTest("Test append headers", function(assert) {
+			var query = new ds.Query('Kind');
+			query.url = 'result.json';
+			query.method = 'get';
+			var ctrl = new adm.ResultTableController('.query-result', query);
+			var jqXHR = ctrl.execute();
+			jqXHR.done(function() {
+				QUnit.start();	
+				var headersEl = $(ctrl.view.el).find('table thead tr:eq(0) th');
+				assert.equal(headersEl.length, 5);
+				assert.equal(headersEl.eq(0).html(), 'field1');
+				assert.equal(headersEl.eq(1).html(), 'field2');
+			});
 		});
-		QUnit.test("Test append headers in table", function(assert) {
-			var ctrl = new adm.ResultTableController('.query-result');	
-			var result1 = [{field : 'field1'}, {field : 'field2'}];
-			ctrl.append(result1);
-			var theadRowEl = $(ctrl.view.el).find('table thead tr:eq(0)');
-			assert.equal(theadRowEl.find('th:eq(0)').html(), 'field1');
-			assert.equal(theadRowEl.find('th:eq(1)').html(), 'field2');
+		QUnit.asyncTest("Test append values in table", function(assert) {
+			var query = new ds.Query('Kind');
+			query.url = 'result.json';
+			query.method = 'get';
+			var ctrl = new adm.ResultTableController('.query-result', query);
+			var jqXHR = ctrl.execute();
+			jqXHR.done(function() {
+				QUnit.start();	
+				var firstRowEl = $(ctrl.view.el).find('table tbody tr:eq(0)');
+				assert.equal(firstRowEl.find('td:eq(0)').html(), 'value');
+				assert.equal(firstRowEl.find('td:eq(1)').html(), '15');
+			});
 		});
-		QUnit.test("Test append values in table", function(assert) {
-			var ctrl = new adm.ResultTableController('.query-result');	
-			var result1 = [{field : 'field1', value : 'value1'}, {field : 'field2', value : 'value2'}];
-			ctrl.append(result1);
-			var firstRowEl = $(ctrl.view.el).find('table tbody tr:eq(0)');
-			assert.equal(firstRowEl.find('td:eq(0)').html(), 'value1');
-			assert.equal(firstRowEl.find('td:eq(1)').html(), 'value2');
+		QUnit.asyncTest("Test append uneven values in table", function(assert) {
+			var query = new ds.Query('Kind');
+			query.url = 'result-uneven.json';
+			query.method = 'get';
+			var ctrl = new adm.ResultTableController('.query-result', query);
+			var jqXHR = ctrl.execute();
+			jqXHR.done(function() {
+				QUnit.start();	
+				var row1Cells = $(ctrl.view.el).find('table tbody tr:eq(0) td');
+				var row2Cells = $(ctrl.view.el).find('table tbody tr:eq(1) td');
+				var row3Cells = $(ctrl.view.el).find('table tbody tr:eq(2) td');
+				assert.equal(row1Cells.length, 3);
+				assert.equal(row2Cells.length, 3);
+				assert.equal(row3Cells.length, 3);
+			});
+		});
+		QUnit.asyncTest("Test paginate result", function(assert) {
+			var query = new ds.Query('Kind');
+			query.url = 'result.json';
+			query.method = 'get';
+			var ctrl = new adm.ResultTableController('.query-result', query);
+			var jqXHR = ctrl.execute();
+			jqXHR.done(function() {
+				QUnit.start();
+				var rowsPage1 = $(ctrl.view.el).find('table tbody tr.page1:visible');
+				assert.equal(rowsPage1.length, 1);
+				QUnit.stop();
+				ctrl.next().done(function() {
+					QUnit.start();
+					var rowsPage1 = $(ctrl.view.el).find('table tbody tr.page1:visible');
+					assert.equal(rowsPage1.length, 0);
+					var rowsPage2 = $(ctrl.view.el).find('table tbody tr.page2:visible');
+					assert.equal(rowsPage2.length, 1);
+				});
+			})
 		});
 	});
   </script>
@@ -57,6 +95,7 @@
 			</tbody>
 		</table>
 	</div>
+</div>
 </div>
 </body>
 </html>
