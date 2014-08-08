@@ -1,15 +1,5 @@
 from google.appengine.ext import ndb
 import entity as entity_api
-import sys
-
-
-def __to_json(query_result):
-    result_json = []
-    for model in query_result:
-        item = model_to_json(model)
-        result_json.append(item)
-
-    return result_json
 
 
 def execute(json):
@@ -39,6 +29,15 @@ def execute(json):
     return {'result': [json_result]}
 
 
+def __to_json(query_result):
+    result_json = []
+    for model in query_result:
+        item = model_to_json(model)
+        result_json.append(item)
+
+    return result_json
+
+
 def model_to_json(model):
     fields = []
     if model:
@@ -47,7 +46,7 @@ def model_to_json(model):
             value = getattr(model, prop)
             item['field'] = prop
             item['value'] = value
-            item['type']  = value.__class__.__name__
+            item['type'] = value.__class__.__name__
 
             fields.append(item)
 
@@ -107,17 +106,20 @@ def __order_query(order_json, query):
 
 
 def __do_query_based_on_operator(query_filter, query):
+    filter_field = query_filter['field']
+    filter_field_type = query_filter['type']
+    filter_value = entity_api.from_filter_type(query_filter['value'], filter_field_type)
     operator = query_filter['operator']
-    print operator
+
     if operator == '=':
-        return query.filter(ndb.GenericProperty(query_filter['field']) == query_filter['value'])
+        return query.filter(ndb.GenericProperty(filter_field) == filter_value)
     elif operator == 'in':
-        return query.filter(ndb.GenericProperty(query_filter['field']).IN(query_filter['value']))
+        return query.filter(ndb.GenericProperty(filter_field).IN(filter_value))
     elif operator == '>':
-        return query.filter(ndb.GenericProperty(query_filter['field']) > query_filter['value'])
+        return query.filter(ndb.GenericProperty(filter_field) > filter_value)
     elif operator == '>=':
-        return query.filter(ndb.GenericProperty(query_filter['field']) >= query_filter['value'])
+        return query.filter(ndb.GenericProperty(filter_field) >= filter_value)
     elif operator == '<':
-        return query.filter(ndb.GenericProperty(query_filter['field']) < query_filter['value'])
+        return query.filter(ndb.GenericProperty(filter_field) < filter_value)
     elif operator == '<=':
-        return query.filter(ndb.GenericProperty(query_filter['field']) <= query_filter['value'])
+        return query.filter(ndb.GenericProperty(filter_field) <= filter_value)

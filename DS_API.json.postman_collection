@@ -1,0 +1,125 @@
+{
+	"id": "9a9fbf3a-b616-4da7-f00c-5e32d1e0c023",
+	"name": "DS_API",
+	"description": "",
+	"order": [],
+	"folders": [
+		{
+			"id": "1826b47b-8656-f2e8-875c-1196699411fb",
+			"name": "Entity",
+			"description": "",
+			"order": [
+				"aaa733f5-d26a-2ea6-f191-cbf2a80c3969"
+			],
+			"collection_name": "DS_API",
+			"collection_id": "9a9fbf3a-b616-4da7-f00c-5e32d1e0c023"
+		},
+		{
+			"id": "7c0b3170-ee06-e80e-11ab-5f7f6d0cc02c",
+			"name": "Query",
+			"description": "",
+			"order": [
+				"2313c4c8-118f-870d-cbd2-9e39fb6dab6a",
+				"1d772b54-bf0b-7c3f-c223-66e744a8b859",
+				"54bed4c4-11e4-3eb7-8954-66501a9ae6e1",
+				"0f66245f-254a-b12e-eed3-3459c750c3e8"
+			],
+			"collection_name": "DS_API",
+			"collection_id": "9a9fbf3a-b616-4da7-f00c-5e32d1e0c023"
+		}
+	],
+	"timestamp": 1407420876941,
+	"synced": false,
+	"requests": [
+		{
+			"id": "0f66245f-254a-b12e-eed3-3459c750c3e8",
+			"headers": "Content-Type: application/json\n",
+			"url": "localhost:8080/api/query",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": "{\n    \"kind\": \"User\",\n    \"order\": [\n        {\n            \"field\": \"nome\",\n            \"direction\": \"ASC\"\n        },\n      \t{\n            \"field\": \"apelido\",\n            \"direction\": \"DESC\"\n        }\n    ]\n}",
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"time": 1407435714533,
+			"name": "GET_ORDER_PLUS",
+			"description": "",
+			"collectionId": "9a9fbf3a-b616-4da7-f00c-5e32d1e0c023",
+			"responses": [],
+			"synced": false
+		},
+		{
+			"id": "1d772b54-bf0b-7c3f-c223-66e744a8b859",
+			"headers": "Content-Type: application/json\n",
+			"url": "localhost:8080/api/query",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": "{\n    \"kind\": \"User\",\n    \"filters\": [\n        {\n            \"field\": \"apelido\",\n            \"operator\": \"in\",\n            \"value\": [\n                \"Lulu\", \"Aula\"\n            ]\n        }\n    ]\n}",
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"time": 1407435665037,
+			"name": "GET_FILTER_IN",
+			"description": "",
+			"collectionId": "9a9fbf3a-b616-4da7-f00c-5e32d1e0c023",
+			"responses": [],
+			"synced": false
+		},
+		{
+			"id": "2313c4c8-118f-870d-cbd2-9e39fb6dab6a",
+			"headers": "Content-Type: application/json\n",
+			"url": "localhost:8080/api/query",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": "{\n \"kind\": \"User\"\n}",
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"time": 1407503699020,
+			"name": "LIST_ALL",
+			"description": "",
+			"collectionId": "9a9fbf3a-b616-4da7-f00c-5e32d1e0c023",
+			"responses": [],
+			"synced": false
+		},
+		{
+			"id": "54bed4c4-11e4-3eb7-8954-66501a9ae6e1",
+			"headers": "Content-Type: application/json\n",
+			"url": "localhost:8080/api/query",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": "{\n    \"kind\": \"User\",\n    \"order\": [\n        {\n            \"field\": \"nome\",\n            \"direction\": \"DESC\"\n        }\n    ]\n}",
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"time": 1407435697338,
+			"name": "GET_ORDER",
+			"description": "",
+			"collectionId": "9a9fbf3a-b616-4da7-f00c-5e32d1e0c023",
+			"responses": [],
+			"synced": false
+		},
+		{
+			"id": "aaa733f5-d26a-2ea6-f191-cbf2a80c3969",
+			"headers": "Content-Type: application/json\n",
+			"url": "localhost:8080/api/entity",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": "{\n    \"kind\": \"User\",\n    \"fields\": [\n        {\n            \"field\": \"nome\",\n            \"value\": \"Luana Silva\"\n        },\n        {\n            \"field\": \"apelido\",\n            \"value\": \"Aula\"\n        },\n        {\n            \"field\": \"senha\",\n            \"value\": \"9999\"\n        },\n        {\n            \"field\": \"idade\",\n            \"value\": 15\n        },\n        {\n            \"field\": \"ultimoAcesso\",\n            \"value\": 123321344,\n            \"type\": \"date\"\n        }\n    ]\n}",
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"time": 1407503707840,
+			"name": "NEW_ENTITY",
+			"description": "",
+			"collectionId": "9a9fbf3a-b616-4da7-f00c-5e32d1e0c023",
+			"responses": [],
+			"synced": false
+		}
+	]
+}
