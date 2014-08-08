@@ -8,6 +8,12 @@ define(['jquery', 'ds-js'], function($, ds) {
 		}
 		this.bindEvents = function(executeCB) {
 			this.el.on('click', '.execute-query', executeCB);
+			this.el.on('keypress', '.query-text', function(evt) {
+				console.info('event.which', evt.which, evt.ctrlKey, evt.which === 13 && evt.ctrlKey);
+				if (evt.which === 10) {
+					executeCB.call();
+				}
+			});
 		}
 	}
 
@@ -20,7 +26,6 @@ define(['jquery', 'ds-js'], function($, ds) {
 		this.executeQuery = function() {
 			var queryStr = _this.view.getQueryString();
 			var query = eval(queryStr);
-			console.info('queryStr', queryStr, query);
 			var ctrl = new ResultTableController(_this.queryEl, query);
 			return ctrl.execute();
 		}
@@ -59,6 +64,7 @@ define(['jquery', 'ds-js'], function($, ds) {
 		this.reset = function() {
 			this.tbody.html('');
 			this.header.html('');
+			this.el.find('.no-results').remove();
 		}
 	}
 

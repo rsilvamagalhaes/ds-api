@@ -26,6 +26,8 @@
 </head>
 
 <body>
+<div class="container-fluid">
+      <div class="row">
 	<div class="container-fluid">
 		<div class="main">
 			<div class="panel-group query-panel">
@@ -52,7 +54,7 @@
 							<a data-toggle="collapse" data-parent="#accordion" href="#expandirItem2" class="collapsed">Results</a>
 						</h4>
 					</div>
-					<div id="expandirItem2" class="panel-collapse">
+					<div id="expandirItem2" class="panel-collapse in">
 						<div class="panel-body">
 							<div class="query-result">
 								<h1 class="sub-header"></h1>
@@ -64,6 +66,7 @@
 										<tbody></tbody>
 									</table>
 								</div>
+								<span class="no-results">No results yet!</span>
 							</div>
 						</div>
 					</div>
@@ -73,6 +76,8 @@
 		</div>
 	</div>
 	</div>
+</div>
+</div>
   	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script data-main="js/adm.js" src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.11/require.js"></script>
 	<script	src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
