@@ -39,7 +39,7 @@ def __to_json(query_result):
         item = {}
         for prop in model._properties.keys():
             value = getattr(model, prop)
-            item[prop] = value
+            item[prop] = entity_api.to_filter_type(value)
 
         result_json.append(item)
 
@@ -88,9 +88,13 @@ def __order_query(order_json, query):
 
 
 def __do_query_based_on_operator(query_filter, query):
+    filter_field = query_filter['field']
+    filter_field_type = query_filter['type']
+    filter_value = entity_api.from_filter_type(query_filter['value'], filter_field_type)
+
     if query_filter['operator'] == '=':
-        return query.filter(ndb.GenericProperty(query_filter['field']) == query_filter['value'])
+        return query.filter(ndb.GenericProperty(filter_field) == filter_value)
     elif query_filter['operator'] == '>':
-        return query.filter(ndb.GenericProperty(query_filter['field']) > query_filter['value'])
+        return query.filter(ndb.GenericProperty(filter_field) > filter_value)
     elif query_filter['operator'] == 'in':
-        return query.filter(ndb.GenericProperty(query_filter['field']).IN(query_filter['value']))
+        return query.filter(ndb.GenericProperty(filter_field).IN(filter_value))
