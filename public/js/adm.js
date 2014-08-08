@@ -1,19 +1,36 @@
 define(['jquery', 'ds-js'], function($, ds) {
 
 	var QueryView = function(selector) {
+
+		var _this = this;
 		this.el = $(selector);
 
 		this.getQueryString = function() {
 			return this.el.find('.query-text').val();
 		}
-		this.bindEvents = function(executeCB) {
-			this.el.on('click', '.execute-query', executeCB);
+		this.bindEvents = function(delegate) {
+			this.el.on('click', '.execute-query', delegate.execute);
 			this.el.on('keypress', '.query-text', function(evt) {
 				if (evt.which === 10) {
-					executeCB.call();
+					delegate.execute.call();
 				}
 			});
+			this.el.on('click', '.next-page', delegate.next);
 		}
+		this.showSuccess = function(msg) {
+			showMessage(msg, 'success');
+		};
+		this.showWarning = function(msg) {
+			showMessage(msg, 'warning');
+		};
+		var showMessage = function(msg, level) {
+			var msgs = _this.el.find('.messages');
+			msgs.html('');
+			var msg = $('<div class="alert alert-' + level + '" role="alert">' + msg + '</div>').appendTo(msgs);
+			window.setTimeout(function() {
+				msg.slideUp('fastest');
+			}, 2000);
+		};
 	}
 
 	var QueryController = function(selector) {
@@ -21,14 +38,37 @@ define(['jquery', 'ds-js'], function($, ds) {
 		var _this = this;
 		this.view = new QueryView(selector);
 		this.queryEl = $(selector).find('.query-result');
+		this.ctrl = null;
 
-		this.executeQuery = function() {
-			var queryStr = _this.view.getQueryString();
-			var query = eval(queryStr);
-			var ctrl = new ResultTableController(_this.queryEl, query);
-			return ctrl.execute();
+		this.execute = function() {
+			try {
+				var query = _this.parseQuery();
+				if (query) {		
+					_this.ctrl = new ResultTableController(_this.queryEl, query);
+					var jqXHR = _this.ctrl.execute();
+					jqXHR.fail(function(jqXHR, status, error) {
+						_this.view.showWarning(error);
+					});
+					return jqXHR;
+				}
+			} catch (e) {
+				_this.view.showWarning(e.toString());
+			}
 		}
-		this.view.bindEvents(this.executeQuery);
+		this.parseQuery = function() {
+			var queryStr = _this.view.getQueryString().trim();
+			if (queryStr) {
+				return eval(queryStr);
+			} else {
+				return null;
+			}
+		}
+		this.next = function() {
+			if (_this.ctrl) {
+				return _this.ctrl.next();
+			}
+		}
+		this.view.bindEvents(this);
 	}
 
 	var ResultTableView = function(selector) {
