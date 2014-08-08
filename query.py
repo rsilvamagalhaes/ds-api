@@ -1,21 +1,12 @@
 from google.appengine.ext import ndb
 import entity as entity_api
-import sys
-
-def __to_json(query_result):
-    result_json = []
-    for model in query_result:
-        item = model_to_json(model)
-        result_json.append(item)
-
-    return result_json
 
 
 def execute(json):
     kind = json['kind']
 
-    if 'name' in json or 'id' in json:
-        json_result = get_results_from_key(kind, json)
+    if 'key' in json:
+        json_result = get_results_from_key(kind, json['key'])
 
     else:
         entity = entity_api.create_generic_model(kind)
@@ -37,22 +28,36 @@ def execute(json):
 
     return {'result': [json_result]}
 
+
+def __to_json(query_result):
+    result_json = []
+    for model in query_result:
+        item = model_to_json(model)
+        result_json.append(item)
+
+    return result_json
+
+
 def model_to_json(model):
-    item = {}
+    fields = []
     if model:
         for prop in model._properties.keys():
+            item = {}
             value = getattr(model, prop)
             item['field'] = prop
             item['value'] = value
             item['type'] = value.__class__.__name__
-    return item
+
+            fields.append(item)
+
+    return fields
 
 
 def get_results_from_key(kind, json):
-    identifier = get_identifier_from_ancestor(json)
-
     ancestors = []
     ancestors.append(kind)
+
+    identifier = get_identifier_from_ancestor(json)
     ancestors.append(identifier)
 
     if 'ancestor' in json:
@@ -63,6 +68,8 @@ def get_results_from_key(kind, json):
 
 
 def get_identifier_from_ancestor(json):
+    identifier = None
+
     if 'name' in json:
         identifier = json['name']
 
@@ -99,9 +106,20 @@ def __order_query(order_json, query):
 
 
 def __do_query_based_on_operator(query_filter, query):
-    if query_filter['operator'] == '=':
-        return query.filter(ndb.GenericProperty(query_filter['field']) == query_filter['value'])
-    elif query_filter['operator'] == '>':
-        return query.filter(ndb.GenericProperty(query_filter['field']) > query_filter['value'])
-    elif query_filter['operator'] == 'in':
-        return query.filter(ndb.GenericProperty(query_filter['field']).IN(query_filter['value']))
+    filter_field = query_filter['field']
+    filter_field_type = query_filter['type']
+    filter_value = entity_api.from_filter_type(query_filter['value'], filter_field_type)
+    operator = query_filter['operator']
+
+    if operator == '=':
+        return query.filter(ndb.GenericProperty(filter_field) == filter_value)
+    elif operator == 'in':
+        return query.filter(ndb.GenericProperty(filter_field).IN(filter_value))
+    elif operator == '>':
+        return query.filter(ndb.GenericProperty(filter_field) > filter_value)
+    elif operator == '>=':
+        return query.filter(ndb.GenericProperty(filter_field) >= filter_value)
+    elif operator == '<':
+        return query.filter(ndb.GenericProperty(filter_field) < filter_value)
+    elif operator == '<=':
+        return query.filter(ndb.GenericProperty(filter_field) <= filter_value)
