@@ -12,9 +12,7 @@
 <title>DS API Admin Panel</title>
 
 <!-- Bootstrap core CSS -->
-<link
-	href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"
-	rel="stylesheet">
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 <link href="/css/adm.css" rel="stylesheet">
 
 <!-- Custom styles for this template -->
@@ -28,37 +26,22 @@
 </head>
 
 <body>
-
-	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse"
-					data-target=".navbar-collapse">
-					<span class="sr-only">Toggle navigation</span> <span
-						class="icon-bar"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="#">DS API</a>
-			</div>
-		</div>
-	</div>
-
 	<div class="container-fluid">
 		<div class="main">
-			<div class="panel-group" id="accordion">
+			<div class="panel-group query-panel" id="accordion">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h4 class="panel-title">
 							<a data-toggle="collapse" data-parent="#accordion" href="#expandirItem1">Query</a>
 						</h4>
 					</div>
-					<div id="expandirItem1" class="panel-collapse collapse in" style="">
+					<div id="expandirItem1" class="panel-collapse in" style="">
 						<div class="panel-body">
 							<form role="form">
 								<div class="form-group">
-									<textarea class="form-control" rows="4" placeholder="new ds.Query('Kind').eq('field', 5)"></textarea>
+									<textarea class="query-text form-control" rows="4" placeholder="new ds.Query('Kind').eq('field', 5)"></textarea>
 								</div>
-								<button type="button" class="btn btn-primary btn-sm">Go</button>
+								<button type="button" class="btn btn-primary btn-sm execute-query">Go</button>
 							</form>
 						</div>
 					</div>
@@ -69,36 +52,42 @@
 							<a data-toggle="collapse" data-parent="#accordion" href="#expandirItem2" class="collapsed">Results</a>
 						</h4>
 					</div>
-					<div id="expandirItem2" class="panel-collapse collapse">
+					<div id="expandirItem2" class="panel-collapse">
 						<div class="panel-body">
-							Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+							<div class="query-result">
+								<h1 class="sub-header"></h1>
+								<div class="table-responsive">
+									<table class="table table-striped">
+										<thead>
+											<tr></tr>
+										</thead>
+										<tbody></tbody>
+									</table>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="query-result" style="display: none;">
-				<h1 class="sub-header">Kind</h1>
-				<div class="table-responsive">
-					<table class="table table-striped">
-						<thead>
-							<tr></tr>
-						</thead>
-						<tbody></tbody>
-					</table>
-				</div>
-			</div>
+			
 		</div>
 	</div>
 	</div>
   	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script data-main="js/adm.js" src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.11/require.js"></script>
+	<script	src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script>
 		require.config({
 			"paths" : {
-				"jquery" : "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min"
+				'jquery' : '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
+				'ds-js' : '/public/api/ds-js',
+				'adm' : '/public/js/adm'
 			}
 		});
+		require(['adm', 'ds-js'], function(adm, ds) {
+			window.ds = ds;
+			adm.init('.query-panel');
+		});
 	</script>
-	<script	src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 </body>
 </html>

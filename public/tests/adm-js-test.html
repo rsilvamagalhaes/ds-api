@@ -26,8 +26,6 @@
 			var result2 = [{field : 'field1'}, {field : 'field3'}];
 			ctrl.append(result2);
 			assert.deepEqual(ctrl.headers, ['field1', 'field2', 'field3']);
-			$('#qunit-fixture').html('<div class="query-result"><h1></h1><table><thead><tr></tr></thead><tbody></tbody></table></div>');
-			console.info($('#qunit-fixture').html());
 		});
 		QUnit.test("Test append headers in table", function(assert) {
 			var ctrl = new adm.ResultTableController('.query-result');	
@@ -36,8 +34,6 @@
 			var theadRowEl = $(ctrl.view.el).find('table thead tr:eq(0)');
 			assert.equal(theadRowEl.find('th:eq(0)').html(), 'field1');
 			assert.equal(theadRowEl.find('th:eq(1)').html(), 'field2');
-			$('#qunit-fixture').html('<div class="query-result"><h1></h1><table><thead><tr></tr></thead><tbody></tbody></table></div>');
-			console.info($('#qunit-fixture').html());
 		});
 		QUnit.test("Test append values in table", function(assert) {
 			var ctrl = new adm.ResultTableController('.query-result');	
@@ -46,7 +42,6 @@
 			var firstRowEl = $(ctrl.view.el).find('table tbody tr:eq(0)');
 			assert.equal(firstRowEl.find('td:eq(0)').html(), 'value1');
 			assert.equal(firstRowEl.find('td:eq(1)').html(), 'value2');
-			console.info($('#qunit-fixture').html());
 		});
 	});
   </script>
