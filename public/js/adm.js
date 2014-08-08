@@ -1,4 +1,36 @@
-define(['jquery', '../api/ds-js', '../js/doT.min'], function($, ds, dot) {
+define(['jquery', 'ds-js'], function($, ds) {
+
+	var QueryView = function(selector) {
+		this.el = $(selector);
+
+		this.getQueryString = function() {
+			return this.el.find('.query-text').val();
+		}
+		this.bindEvents = function(executeCB) {
+			this.el.on('click', '.execute-query', executeCB);
+			this.el.on('keypress', '.query-text', function(evt) {
+				console.info('event.which', evt.which, evt.ctrlKey, evt.which === 13 && evt.ctrlKey);
+				if (evt.which === 10) {
+					executeCB.call();
+				}
+			});
+		}
+	}
+
+	var QueryController = function(selector) {
+
+		var _this = this;
+		this.view = new QueryView(selector);
+		this.queryEl = $(selector).find('.query-result');
+
+		this.executeQuery = function() {
+			var queryStr = _this.view.getQueryString();
+			var query = eval(queryStr);
+			var ctrl = new ResultTableController(_this.queryEl, query);
+			return ctrl.execute();
+		}
+		this.view.bindEvents(this.executeQuery);
+	}
 
 	var ResultTableView = function(selector) {
 
@@ -29,6 +61,11 @@ define(['jquery', '../api/ds-js', '../js/doT.min'], function($, ds, dot) {
 				}
 			}
 		}
+		this.reset = function() {
+			this.tbody.html('');
+			this.header.html('');
+			this.el.find('.no-results').remove();
+		}
 	}
 
 	var ResultTableController = function(selector, query) {
@@ -38,13 +75,14 @@ define(['jquery', '../api/ds-js', '../js/doT.min'], function($, ds, dot) {
 		this.query = query;
 		this.headers = [];
 		this.execute = function() {
+			this.view.reset();
 			var jqXHR = this.query.execute();
 			jqXHR.iterate(this.append);
 			jqXHR.done(this.process);
 			return jqXHR;
 		}
 		this.process = function(result) {
-			_this.view.setQueryTitle(this.query.kind);
+			_this.view.setQueryTitle(_this.query.kind);
 		}
 		this.append = function(result) {
 			_this.view.addRow();
@@ -69,9 +107,9 @@ define(['jquery', '../api/ds-js', '../js/doT.min'], function($, ds, dot) {
 		}
 	}
 
-	var showResults = function(selector, query) {
-		var ctrl = new ResultTableController(selector, query);
-		return ctrl.execute();
+	var init = function(selector) {
+		var ctrl = new QueryController(selector);
+		return ctrl;
 	}
-	return {ResultTableController : ResultTableController, showResults: showResults};
+	return {ResultTableController : ResultTableController, init : init};
 });

@@ -5,8 +5,8 @@ import entity as entity_api
 def execute(json):
     kind = json['kind']
 
-    if ('name' in json) or ('id' in json) or ('ancestor' in json):
-        json_result = get_results_from_key(kind, json)
+    if 'key' in json:
+        json_result = get_results_from_key(kind, json['key'])
 
     else:
         entity = entity_api.create_generic_model(kind)
