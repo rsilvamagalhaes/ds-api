@@ -1,5 +1,6 @@
 from bottle import Bottle, request, error
 import query as query_entity
+import sys
 bottle = Bottle()
 
 
@@ -10,5 +11,8 @@ def error404():
 
 @bottle.post('/api/query')
 def do_query():
-    result_json = query_entity.execute(request.json)
-    return result_json
+    try:
+        result_json = query_entity.execute(request.json)
+        return result_json
+    except:
+        print sys.exc_info()

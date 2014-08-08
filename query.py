@@ -1,14 +1,11 @@
 from google.appengine.ext import ndb
 import entity as entity_api
-from bottle import Bottle
-bottle = Bottle()
 
 
 def execute(json):
     kind = json['kind']
 
-    #Key methods
-    if 'name' in json or 'id' in json:
+    if ('name' in json) or ('id' in json) or ('ancestor' in json):
         json_result = get_results_from_key(kind, json)
 
     else:
@@ -34,44 +31,65 @@ def execute(json):
 
 def __to_json(query_result):
     result_json = []
-
     for model in query_result:
-        item = {}
-        for prop in model._properties.keys():
-            value = getattr(model, prop)
-            item[prop] = entity_api.to_filter_type(value)
-
+        item = model_to_json(model)
         result_json.append(item)
 
     return result_json
 
 
 def model_to_json(model):
-    item = {}
+    fields = []
     if model:
         for prop in model._properties.keys():
+            item = {}
             value = getattr(model, prop)
             item['field'] = prop
             item['value'] = value
             item['type'] = value.__class__.__name__
-    return item
+
+            fields.append(item)
+
+    return fields
 
 
 def get_results_from_key(kind, json):
+    ancestors = []
+    ancestors.append(kind)
+
+    identifier = get_identifier_from_ancestor(json)
+    ancestors.append(identifier)
+
+    if 'ancestor' in json:
+        ancestors = get_ancestors(json, ancestors)
+
+    key = ndb.Key(flat=ancestors)
+    return model_to_json(key.get())
+
+
+def get_identifier_from_ancestor(json):
+    identifier = None
+
     if 'name' in json:
         identifier = json['name']
 
     if 'id' in json:
-        identifier = json['id']
+        identifier = long(json['id'])
 
-    key = ndb.Key(kind, identifier)
+    return identifier
 
-    if 'ancestor' in json:
-        ancestor_kind = json['ancestor']['kind']
-        ancestor_id = json['ancestor']['id']
-        key = ndb.Key(kind, identifier, ancestor_kind, ancestor_id)
 
-    return model_to_json(key.get())
+def get_ancestors(json, ancestors):
+    while 'ancestor' in json:
+        ancestor_kind = json['kind']
+        identifier = get_identifier_from_ancestor(json)
+
+        ancestors.append(ancestor_kind)
+        ancestors.append(identifier)
+
+        json = json['ancestor']
+
+    return ancestors
 
 
 def __order_query(order_json, query):
@@ -91,10 +109,17 @@ def __do_query_based_on_operator(query_filter, query):
     filter_field = query_filter['field']
     filter_field_type = query_filter['type']
     filter_value = entity_api.from_filter_type(query_filter['value'], filter_field_type)
+    operator = query_filter['operator']
 
-    if query_filter['operator'] == '=':
+    if operator == '=':
         return query.filter(ndb.GenericProperty(filter_field) == filter_value)
-    elif query_filter['operator'] == '>':
-        return query.filter(ndb.GenericProperty(filter_field) > filter_value)
-    elif query_filter['operator'] == 'in':
+    elif operator == 'in':
         return query.filter(ndb.GenericProperty(filter_field).IN(filter_value))
+    elif operator == '>':
+        return query.filter(ndb.GenericProperty(filter_field) > filter_value)
+    elif operator == '>=':
+        return query.filter(ndb.GenericProperty(filter_field) >= filter_value)
+    elif operator == '<':
+        return query.filter(ndb.GenericProperty(filter_field) < filter_value)
+    elif operator == '<=':
+        return query.filter(ndb.GenericProperty(filter_field) <= filter_value)
