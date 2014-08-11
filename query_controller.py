@@ -8,7 +8,6 @@ bottle = Bottle()
 def error404():
     return 'Nothing here, sorry'
 
-
 @bottle.post('/api/query')
 def do_query():
     result_json = query_entity.execute(request.json)
