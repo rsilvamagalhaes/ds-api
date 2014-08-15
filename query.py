@@ -1,12 +1,15 @@
 from google.appengine.ext import ndb
 import entity as entity_api
 
+QUERY_LIMIT = 30
 
 def execute(json):
     kind = json['kind']
 
     if 'key' in json:
-        json_result = get_results_from_key(kind, json['key'])
+        json = __decide_which_key_will_use(json)
+        json_result = get_results_from_key(json)
+        #json_result = get_results_from_key(kind, json['key'])
 
     else:
         entity = entity_api.create_generic_model(kind)
@@ -19,14 +22,18 @@ def execute(json):
         if 'order' in json:
             query = __order_query(json['order'], query)
 
-        limit = None
-        if 'limit' in json:
-            limit = int(json['limit'])
+        limit = __set_limit(json)
 
         fetch = query.fetch(limit)
         json_result = __to_json(fetch)
 
     return {'result': [json_result]}
+
+
+def __set_limit(json):
+    limit = QUERY_LIMIT
+    if 'limit' in json:
+        limit = int(json['limit'])
 
 
 def __to_json(query_result):
@@ -36,6 +43,16 @@ def __to_json(query_result):
         result_json.append(item)
 
     return result_json
+
+
+def __decide_which_key_will_use(json):
+    if 'key' in json:
+        print 'eh key'
+        json = json['key']
+    else:
+        json = json['ancestor']
+
+    return json
 
 
 def model_to_json(model):
@@ -54,17 +71,18 @@ def model_to_json(model):
 
 
 def get_results_from_key(kind, json):
-    ancestors = []
-    ancestors.append(kind)
-
-    identifier = get_identifier_from_ancestor(json)
-    ancestors.append(identifier)
-
-    if 'ancestor' in json:
-        ancestors = get_ancestors(json, ancestors)
-
-    key = ndb.Key(flat=ancestors)
-    return model_to_json(key.get())
+    return model_to_json(entity_api.get_key(json))
+    # ancestors = []
+    # ancestors.append(kind)
+    #
+    # identifier = get_identifier_from_ancestor(json)
+    # ancestors.append(identifier)
+    #
+    # if 'ancestor' in json:
+    #     ancestors = get_ancestors(json, ancestors)
+    #
+    # key = ndb.Key(flat=ancestors)
+    # return model_to_json(key.get())
 
 
 def get_identifier_from_ancestor(json):

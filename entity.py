@@ -1,7 +1,7 @@
 from google.appengine.ext import ndb
 import datetime
 import sys
-
+import query
 
 def put(json):
     p = create_generic_model(json['kind'])
@@ -24,8 +24,49 @@ def create_generic_model(kind):
     return GenericModel()
 
 
+def get_key(json):
+    kind = json['kind']
+    ancestors = []
+    ancestors.append(kind)
+
+    identifier = get_identifier_from_ancestor(json)
+    ancestors.append(identifier)
+
+    if 'ancestor' in json:
+        ancestors = get_ancestors(json, ancestors)
+
+    key = ndb.Key(flat=ancestors)
+    return key
+
+
+def get_ancestors(json, ancestors):
+    while 'ancestor' in json:
+        ancestor_kind = json['kind']
+        identifier = get_identifier_from_ancestor(json)
+
+        ancestors.append(ancestor_kind)
+        ancestors.append(identifier)
+
+        json = json['ancestor']
+
+    return ancestors
+
+
+def get_identifier_from_ancestor(json):
+    identifier = None
+
+    if 'name' in json:
+        identifier = json['name']
+
+    if 'id' in json:
+        identifier = long(json['id'])
+
+    return identifier
+
+
 def from_filter_type(value, field_type):
-    options = {'date': __long_to_date}
+    options = {'date': __long_to_date,
+               'key': get_key}
 
     if field_type in options:
         return options[field_type](value)
