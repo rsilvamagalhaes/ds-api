@@ -8,7 +8,9 @@ def put(json):
 
     for field in json['fields']:
         if 'type' in field:
-            setattr(p, field['field'], from_filter_type(field['value'], field['type']))
+            value = from_filter_type(field['value'], field['type'])
+            print value
+            setattr(p, field['field'], value)
         else:
             setattr(p, field['field'], field['value'])
 

@@ -23,7 +23,6 @@ def execute(json):
             query = __order_query(json['order'], query)
 
         limit = __set_limit(json)
-
         fetch = query.fetch(limit)
         json_result = __to_json(fetch)
 
@@ -131,7 +130,7 @@ def __do_query_based_on_operator(query_filter, query):
     else:
         filter_field_type = None
 
-    filter_value = entity_api.from_filter_type(query_filter['value'], filter_field_type)
+    filter_value = entity_api.from_filter_type(query_filter['value'], filter_field_type).urlsafe()
 
     operator = query_filter['operator']
 

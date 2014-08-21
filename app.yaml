@@ -1,4 +1,4 @@
-application: hello-bottle-app-engine
+application: ds-api
 version: 1
 runtime: python27
 api_version: 1
@@ -6,8 +6,14 @@ threadsafe: no
 
 handlers:
 
+- url: /public
+  static_dir: public
+
 - url: /api/query
   script: query_controller.bottle
 
 - url: /api/entity
   script: entity_controller.bottle
+
+- url: /adm
+  script: main.bottle
