@@ -1,5 +1,5 @@
 import pytest
-import entity as entity_api
+import src.controllers.entity as entity_api
 from google.appengine.ext import ndb
 
 def create_generic_model(kind):
