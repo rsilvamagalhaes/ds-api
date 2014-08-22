@@ -47,10 +47,14 @@ def test_max_limit():
 
 query_desc = {"kind": "User","order": [{"field": "idade","direction": "DESC"}]}
 
-def test_query_order_desc():
+
+def put_user_changing_ages():
     for i in xrange(0, 3):
         put_entity_json['fields'][2]['value'] = 21 + i
         entity_api.put(put_entity_json)
+
+def test_query_order_desc():
+    put_user_changing_ages()
 
     json = query_api.execute(query_desc)
     ages = [23,22,21]
@@ -63,9 +67,7 @@ def test_query_order_desc():
 query_asc = {"kind": "User","order": [{"field": "idade","direction": "ASC"}]}
 
 def test_query_order_asc():
-    for i in xrange(0, 3):
-        put_entity_json['fields'][2]['value'] = 21 + i
-        entity_api.put(put_entity_json)
+    put_user_changing_ages()
 
     json = query_api.execute(query_asc)
     ages = [21,22,23]
@@ -75,9 +77,8 @@ def test_query_order_asc():
                 assert ages[index] == field['value']
 
 
-
-
-
+def test_query_order_desc_and_asc():
+    put_user_changing_ages()
 
 
 
