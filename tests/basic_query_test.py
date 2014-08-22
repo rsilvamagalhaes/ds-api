@@ -77,8 +77,21 @@ def test_query_order_asc():
                 assert ages[index] == field['value']
 
 
+query_asc_and_desc = {"kind": "User","order": [{"field": "nome","direction": "ASC"},{"field": "idade","direction": "DESC"}]}
+query_asc_and_desc_2 = {"kind": "User", "order": [{"field": "idade","direction": "ASC"},{"field": "nome","direction": "DESC"}]}
+
 def test_query_order_desc_and_asc():
-    put_user_changing_ages()
+    names = ['Felipe Volpone','Gustavo Silverio','Guilherme Gotardo']
+    for i in xrange(0, 3):
+        put_entity_json['fields'][1]['value'] = names[i]
+        entity_api.put(put_entity_json)
+
+    json = query_api.execute(query_asc_and_desc)
+    for index, entity in enumerate(json['result']):
+        for field in entity:
+            if 'name' in field['field']:
+                assert names[index] == field['value']
+
 
 
 
