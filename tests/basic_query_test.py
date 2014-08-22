@@ -44,3 +44,53 @@ def test_max_limit():
     json = query_api.execute(query_limit)
     assert len(json['result']) == 30
 
+
+query_desc = {"kind": "User","order": [{"field": "idade","direction": "DESC"}]}
+
+def test_query_order_desc():
+    for i in xrange(0, 3):
+        put_entity_json['fields'][2]['value'] = 21 + i
+        entity_api.put(put_entity_json)
+
+    json = query_api.execute(query_desc)
+    ages = [23,22,21]
+    for index, entity in enumerate(json['result']):
+        for field in entity:
+                if 'idade' in field['field']:
+                    assert ages[index] == field['value']
+
+
+query_asc = {"kind": "User","order": [{"field": "idade","direction": "ASC"}]}
+
+def test_query_order_asc():
+    for i in xrange(0, 3):
+        put_entity_json['fields'][2]['value'] = 21 + i
+        entity_api.put(put_entity_json)
+
+    json = query_api.execute(query_asc)
+    ages = [21,22,23]
+    for index, entity in enumerate(json['result']):
+        for field in entity:
+                if 'idade' in field['field']:
+                    assert ages[index] == field['value']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
