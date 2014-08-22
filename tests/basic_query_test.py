@@ -56,8 +56,8 @@ def test_query_order_desc():
     ages = [23,22,21]
     for index, entity in enumerate(json['result']):
         for field in entity:
-                if 'idade' in field['field']:
-                    assert ages[index] == field['value']
+            if 'idade' in field['field']:
+                assert ages[index] == field['value']
 
 
 query_asc = {"kind": "User","order": [{"field": "idade","direction": "ASC"}]}
@@ -71,8 +71,8 @@ def test_query_order_asc():
     ages = [21,22,23]
     for index, entity in enumerate(json['result']):
         for field in entity:
-                if 'idade' in field['field']:
-                    assert ages[index] == field['value']
+            if 'idade' in field['field']:
+                assert ages[index] == field['value']
 
 
 
