@@ -7,9 +7,8 @@ def execute(json):
     kind = json['kind']
 
     if 'key' in json:
-        json = __decide_which_key_will_use(json)
+        #json = __decide_which_key_will_use(json)
         json_result = get_results_from_key(json)
-        #json_result = get_results_from_key(kind, json['key'])
 
     else:
         entity = entity_api.create_generic_model(kind)
@@ -48,7 +47,6 @@ def __to_json(query_result):
 
 def __decide_which_key_will_use(json):
     if 'key' in json:
-        print 'eh key'
         json = json['key']
     else:
         json = json['ancestor']
@@ -57,8 +55,13 @@ def __decide_which_key_will_use(json):
 
 
 def model_to_json(model):
-    fields = []
+    json_model = {}
     if model:
+
+        json_model['id'] = model.key.id()
+        json_model['kind'] = model.key.kind()
+
+        json_model['fields'] = []
         for prop in model._properties.keys():
             item = {}
             value = getattr(model, prop)
@@ -66,12 +69,12 @@ def model_to_json(model):
             item['value'] = entity_api.to_filter_type(value)
             item['type'] = value.__class__.__name__
 
-            fields.append(item)
+            json_model['fields'].append(item)
 
-    return fields
+    return json_model
 
 
-def get_results_from_key(kind, json):
+def get_results_from_key(json):
     return model_to_json(entity_api.get_key(json))
     # ancestors = []
     # ancestors.append(kind)

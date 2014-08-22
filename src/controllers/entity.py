@@ -8,7 +8,6 @@ def put(json):
     for field in json['fields']:
         if 'type' in field:
             value = from_filter_type(field['value'], field['type'])
-            print value
             setattr(p, field['field'], value)
         else:
             setattr(p, field['field'], field['value'])
@@ -26,9 +25,11 @@ def create_generic_model(kind):
 
 
 def get_key(json):
+
     kind = json['kind']
     ancestors = []
     ancestors.append(kind)
+    json = __decide_which_key_will_use(json)
 
     identifier = get_identifier_from_ancestor(json)
     ancestors.append(identifier)
@@ -37,7 +38,16 @@ def get_key(json):
         ancestors = get_ancestors(json, ancestors)
 
     key = ndb.Key(flat=ancestors)
-    return key
+    return key.get()
+
+
+def __decide_which_key_will_use(json):
+    if 'key' in json:
+        json = json['key']
+    else:
+        json = json['ancestor']
+
+    return json
 
 
 def get_ancestors(json, ancestors):

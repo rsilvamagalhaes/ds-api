@@ -41,11 +41,17 @@ query_gt_no_result = {'kind': 'User', 'filters': [{'field': 'idade', 'operator':
 query_lt_no_result = {'kind': 'User', 'filters': [{'field': 'idade', 'operator': '>', 'value': '21'}]}
 query_in_no_result = {"kind": "User", "filters": [{"field": "nome", "operator": "in", "value": ["Roberto","Bob"]}]}
 
+def get_fields(json):
+    if 'fields' in json:
+        return json['fields']
+    else:
+        return []
+
 def test_basic_query_with_filter_operator_eq():
     entity_api.put(put_entity_json)
 
     json = query_api.execute(query_eq)
-    for fields in json['result']:
+    for fields in get_fields(json):
         for field in fields:
 
             if 'nome' in field:
@@ -59,7 +65,7 @@ def test_basic_query_with_filter_operator_gt():
     entity_api.put(put_entity_json)
 
     json = query_api.execute(query_gt)
-    for fields in json['result']:
+    for fields in get_fields(json):
         for field in fields:
 
             if 'idade' in field:
@@ -74,7 +80,7 @@ def test_basic_query_with_filter_operator_lt():
     entity_api.put(put_entity_json)
 
     json = query_api.execute(query_lt)
-    for fields in json['result']:
+    for fields in get_fields(json):
         for field in fields:
 
             if 'idade' in field:
@@ -88,7 +94,7 @@ def test_basic_query_with_filter_operator_in():
     entity_api.put(put_entity_json)
 
     json = query_api.execute(query_in)
-    for fields in json['result']:
+    for fields in get_fields(json):
         for field in fields:
 
             if 'nome' in field:

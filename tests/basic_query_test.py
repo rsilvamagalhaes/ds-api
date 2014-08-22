@@ -24,6 +24,14 @@ put_entity_json = {
 
 query_limit = {"kind": "User"}
 
+def get_fields(json):
+    if 'fields' in json:
+        return json['fields']
+    else:
+        return []
+
+
+
 def test_limit():
     entity_api.put(put_entity_json)
 
@@ -58,7 +66,7 @@ def test_query_order_desc():
 
     json = query_api.execute(query_desc)
     ages = [23,22,21]
-    for index, entity in enumerate(json['result']):
+    for index, entity in enumerate(get_fields(json)):
         for field in entity:
             if 'idade' in field['field']:
                 assert ages[index] == field['value']
@@ -71,7 +79,7 @@ def test_query_order_asc():
 
     json = query_api.execute(query_asc)
     ages = [21,22,23]
-    for index, entity in enumerate(json['result']):
+    for index, entity in enumerate(get_fields(json)):
         for field in entity:
             if 'idade' in field['field']:
                 assert ages[index] == field['value']
@@ -86,8 +94,8 @@ def test_query_order_desc_and_asc():
         put_entity_json['fields'][1]['value'] = names[i]
         entity_api.put(put_entity_json)
 
-    json = query_api.execute(query_asc_and_desc)
-    for index, entity in enumerate(json['result']):
+    json = query_api.execute(query_asc_and_desc_2)
+    for index, entity in enumerate(get_fields(json)):
         for field in entity:
             if 'name' in field['field']:
                 assert names[index] == field['value']
