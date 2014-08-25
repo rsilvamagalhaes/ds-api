@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 import datetime
-import sys
+import sys, logging
 
 def put(json):
     p = create_generic_model(json['kind'])
@@ -37,9 +37,7 @@ def get_key(json):
     if 'ancestor' in json:
         ancestors = get_ancestors(json, ancestors)
 
-
     key = ndb.Key(flat=ancestors)
-    #return __fetch_key(key)
     return key
 
 

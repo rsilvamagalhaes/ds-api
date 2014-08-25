@@ -6,8 +6,7 @@ QUERY_LIMIT = 30
 def execute(json):
     kind = json['kind']
 
-    if 'key' in json:
-        #json = __decide_which_key_will_use(json)
+    if 'key' in json or 'ancestor' in json:
         json_result = get_results_from_key(json)
 
     else:
@@ -37,10 +36,13 @@ def __set_limit(json):
 
 
 def __to_json(query_result):
+
     result_json = []
     for model in query_result:
-        item = model_to_json(model)
-        result_json.append(item)
+
+        if model != None:
+            item = model_to_json(model)
+            result_json.append(item)
 
     return result_json
 
