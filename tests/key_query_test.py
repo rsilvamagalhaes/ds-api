@@ -2,7 +2,6 @@ import pytest
 import src.controllers.entity as entity_api
 import src.controllers.query as query_api
 from google.appengine.ext import ndb
-import json
 
 FATHERS_NAME = "Celso"
 
