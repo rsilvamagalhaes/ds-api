@@ -75,18 +75,13 @@ def model_to_json(model):
 
 
 def get_results_from_key(json):
-    return model_to_json(entity_api.get_key(json))
-    # ancestors = []
-    # ancestors.append(kind)
-    #
-    # identifier = get_identifier_from_ancestor(json)
-    # ancestors.append(identifier)
-    #
-    # if 'ancestor' in json:
-    #     ancestors = get_ancestors(json, ancestors)
-    #
-    # key = ndb.Key(flat=ancestors)
-    # return model_to_json(key.get())
+    key = entity_api.get_key(json)
+    result_from_db = key.get()
+
+    if not isinstance(result_from_db, list):
+        result_from_db = [result_from_db]
+
+    return __to_json(result_from_db)
 
 
 def get_identifier_from_ancestor(json):

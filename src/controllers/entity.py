@@ -37,17 +37,21 @@ def get_key(json):
     if 'ancestor' in json:
         ancestors = get_ancestors(json, ancestors)
 
+
     key = ndb.Key(flat=ancestors)
-    return key.get()
+    #return __fetch_key(key)
+    return key
 
 
 def __decide_which_key_will_use(json):
+    new_step = json
     if 'key' in json:
-        json = json['key']
+        new_step = json['key']
     else:
-        json = json['ancestor']
+        if 'ancestor' in json:
+            new_step = json['ancestor']
 
-    return json
+    return new_step
 
 
 def get_ancestors(json, ancestors):
