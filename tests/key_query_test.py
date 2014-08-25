@@ -10,7 +10,6 @@ entity_json_father = {"kind": "User","fields": [{"field": "nome","value": FATHER
 entity_json_son    = {"kind": "User","fields": [{"field": "nome","value": "Bob"}, {"type": "key","field": "pai", "value": {"kind":"User", "id": 111}}]}
 
 query_operator_eq_father = {'kind':'User','filters':[{'field':'nome', 'value': FATHERS_NAME, 'operator': '='}]}
-# query_operator_eq_son    = {'kind':'User','filters':[{'field':'nome', 'value': 'Bob', 'operator': '='}]}
 
 # query_ancestor = {'kind': 'User', 'ancestor': {'kind': 'User', 'id': 15}}
 # query_key_name = {'kind': 'User', 'key': {'kind': 'User', 'name': 'someName'}}
