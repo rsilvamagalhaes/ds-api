@@ -3,7 +3,12 @@ import datetime
 import sys, logging
 
 def put(json):
-    p = create_generic_model(json['kind'])
+
+    if 'ancestor' in json:
+        ancestor_key = create_ancestor_key(json)
+        p = create_generic_model_with_ancestor(json['kind'], ancestor_key)
+    else:
+        p = create_generic_model(json['kind'])
 
     for field in json['fields']:
         if 'type' in field:
@@ -12,7 +17,7 @@ def put(json):
         else:
             setattr(p, field['field'], field['value'])
 
-    return p.put().urlsafe()
+    p.put()
 
 
 def create_generic_model(kind):
@@ -24,21 +29,35 @@ def create_generic_model(kind):
     return GenericModel()
 
 
+def create_generic_model_with_ancestor(kind, ancestor_key):
+    class GenericModel(ndb.Expando):
+        @classmethod
+        def _get_kind(cls):
+            return kind
+
+    return GenericModel(parent=ancestor_key)
+
+
+def create_ancestor_key(json):
+    ancestors = get_ancestors(json, [])
+    return ndb.Key(flat=ancestors)
+
+
 def get_key(json):
 
     kind = json['kind']
     ancestors = []
-    ancestors.append(kind)
-    json = __decide_which_key_will_use(json)
-
-    identifier = get_identifier_from_ancestor(json)
-    ancestors.append(identifier)
 
     if 'ancestor' in json:
         ancestors = get_ancestors(json, ancestors)
+    else:
+        json = __decide_which_key_will_use(json)
 
-    key = ndb.Key(flat=ancestors)
-    return key
+    identifier = get_identifier_from_ancestor(json)
+    ancestors.append(kind)
+    ancestors.append(identifier)
+
+    return ndb.Key(flat=ancestors)
 
 
 def __decide_which_key_will_use(json):
@@ -54,13 +73,12 @@ def __decide_which_key_will_use(json):
 
 def get_ancestors(json, ancestors):
     while 'ancestor' in json:
+        json = json['ancestor']
+
         ancestor_kind = json['kind']
         identifier = get_identifier_from_ancestor(json)
-
         ancestors.append(ancestor_kind)
         ancestors.append(identifier)
-
-        json = json['ancestor']
 
     return ancestors
 

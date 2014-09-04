@@ -58,12 +58,12 @@ def __decide_which_key_will_use(json):
 
 def model_to_json(model):
     json_model = {}
-    if model:
 
+    if model:
         json_model['id'] = model.key.id()
         json_model['kind'] = model.key.kind()
-
         json_model['fields'] = []
+
         for prop in model._properties.keys():
             item = {}
             value = getattr(model, prop)
@@ -77,13 +77,24 @@ def model_to_json(model):
 
 
 def get_results_from_key(json):
-    key = entity_api.get_key(json)
-    result_from_db = key.get()
 
-    if not isinstance(result_from_db, list):
-        result_from_db = [result_from_db]
+    if  not 'id' in json and not 'name' in json:
+        kind   = json['kind']
 
-    return __to_json(result_from_db)
+        ancestor_key = entity_api.create_ancestor_key(json)
+        entity = entity_api.create_generic_model_with_ancestor(kind, ancestor_key)
+        query = entity.query(ancestor=ancestor_key)
+        print query
+        return __to_json(query.fetch(QUERY_LIMIT))
+
+    else:
+        key = entity_api.get_key(json)
+        result_from_db = key.get()
+
+        if not isinstance(result_from_db, list):
+            result_from_db = [result_from_db]
+
+        return __to_json(result_from_db)
 
 
 def get_identifier_from_ancestor(json):
@@ -91,9 +102,9 @@ def get_identifier_from_ancestor(json):
 
     if 'name' in json:
         identifier = json['name']
-
-    if 'id' in json:
-        identifier = long(json['id'])
+    else:
+        if 'id' in json:
+            identifier = long(json['id'])
 
     return identifier
 
@@ -101,12 +112,12 @@ def get_identifier_from_ancestor(json):
 def get_ancestors(json, ancestors):
     while 'ancestor' in json:
         ancestor_kind = json['kind']
-        identifier = get_identifier_from_ancestor(json)
 
+        json = json['ancestor']
+        identifier = get_identifier_from_ancestor(json)
         ancestors.append(ancestor_kind)
         ancestors.append(identifier)
 
-        json = json['ancestor']
 
     return ancestors
 
