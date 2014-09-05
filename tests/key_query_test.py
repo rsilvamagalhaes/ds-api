@@ -12,12 +12,6 @@ query_operator_eq_father = {'kind':'User','filters':[{'field':'nome', 'value': F
 query_find_father_by_key_id   = {'kind': 'User', 'key': {'kind': 'User', 'id': 111}}
 
 
-def test_create_entity_with_key_field():
-    entity_api.put(entity_father)
-    father_json = query_api.execute(query_operator_eq_father)
-    assert len(father_json['result']) == 1
-
-
 def test_get_entity_by_key():
     entity_api.put(entity_father)
 
@@ -29,36 +23,38 @@ def test_get_entity_by_key():
 
     son_json = query_api.execute(query_find_father_by_key_id)
     assert len(son_json['result']) == 1
+
     assert get_father_id(father_json) == son_json['result'][0]['id']
-    assert FATHERS_NAME == son_json['result'][0]['fields'][0]['value']
+
+    result_name = son_json['result'][0]['fields'][0]['value']
+    assert FATHERS_NAME == result_name
 
 
-entity_son_ancestor  = {"kind": "User","fields": [{"field": "nome","value": SONS_NAME}], "ancestor": {"kind":"User", "id": 111}}
+entity_son_ancestor  = {"kind": "User", "fields": [{"field": "nome","value": SONS_NAME}], "ancestor": {"kind":"User", "id": 111}}
 query_find_son_by_ancestor = {"kind": "User", "ancestor": {"kind": "User", "id": 111}}
 
-def test_put_ancestor():
+def test_get_ancestor():
     entity_api.put(entity_father)
 
     father = query_api.execute(query_operator_eq_father)
     assert len(father['result']) == 1
 
+    ###
     father_id = get_father_id(father)
     entity_son_ancestor['ancestor']['id'] = father_id
-    entity_api.put(entity_son_ancestor)
-
-    # query_operator_eq_son = {'kind':'User','filters':[{'field':'nome', 'value': SONS_NAME, 'operator': '='}]}
-    # print query_api.execute(query_operator_eq_son)
-    # print query_api.execute(query_find_son_by_ancestor)
-
     query_find_son_by_ancestor['ancestor']['id'] = father_id
+    ###
+
+    entity_api.put(entity_son_ancestor)
     result_by_ancestor = query_api.execute(query_find_son_by_ancestor)
+
     assert len(result_by_ancestor['result']) == 1
 
-    name_of_son = result_by_ancestor['result'][0]['fields'][0]['value']
-    assert name_of_son == SONS_NAME
-    assert father_id == result_by_ancestor['result'][0]['id']
-
-
+#     name_of_son = result_by_ancestor['result'][0]['fields'][0]['value']
+#     assert name_of_son == SONS_NAME
+#     assert father_id == result_by_ancestor['result'][0]['id']
+#
+#
 def get_father_id(father_json):
     return father_json['result'][0]['id']
 

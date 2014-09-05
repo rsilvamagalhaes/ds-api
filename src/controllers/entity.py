@@ -2,13 +2,16 @@ from google.appengine.ext import ndb
 import datetime
 import sys, logging
 
+
 def put(json):
 
+    kind = json['kind']
     if 'ancestor' in json:
-        ancestor_key = create_ancestor_key(json)
-        p = create_generic_model_with_ancestor(json['kind'], ancestor_key)
+        json_parent = json['ancestor']
+        parent = create_key(json_parent)
+        p = create_generic_model_with_parent(kind, parent)
     else:
-        p = create_generic_model(json['kind'])
+        p = create_generic_model(kind)
 
     for field in json['fields']:
         if 'type' in field:
@@ -28,76 +31,49 @@ def create_generic_model(kind):
 
     return GenericModel()
 
-
-def create_generic_model_with_ancestor(kind, ancestor_key):
+def create_generic_model_with_parent(kind, parent_key):
     class GenericModel(ndb.Expando):
         @classmethod
         def _get_kind(cls):
             return kind
 
-    return GenericModel(parent=ancestor_key)
+    return GenericModel(parent=parent_key)
 
 
-def create_ancestor_key(json):
-    ancestors = get_ancestors(json, [])
-    return ndb.Key(flat=ancestors)
-
-
-def get_key(json):
-
+def create_key(json):
     kind = json['kind']
-    ancestors = []
-
-    if 'ancestor' in json:
-        ancestors = get_ancestors(json, ancestors)
-    else:
-        json = __decide_which_key_will_use(json)
-
-    identifier = get_identifier_from_ancestor(json)
-    ancestors.append(kind)
-    ancestors.append(identifier)
-
-    return ndb.Key(flat=ancestors)
+    identifier = __get_identifier_to_key(json)
+    return ndb.Key(flat=[kind, identifier])
 
 
-def __decide_which_key_will_use(json):
-    new_step = json
-    if 'key' in json:
-        new_step = json['key']
-    else:
-        if 'ancestor' in json:
-            new_step = json['ancestor']
-
-    return new_step
-
-
-def get_ancestors(json, ancestors):
-    while 'ancestor' in json:
-        json = json['ancestor']
-
-        ancestor_kind = json['kind']
-        identifier = get_identifier_from_ancestor(json)
-        ancestors.append(ancestor_kind)
-        ancestors.append(identifier)
-
-    return ancestors
-
-
-def get_identifier_from_ancestor(json):
+def __get_identifier_to_key(json):
     identifier = None
+
+    if 'id' in json:
+        identifier = json['id']
 
     if 'name' in json:
         identifier = json['name']
 
-    if 'id' in json:
-        identifier = long(json['id'])
-
     return identifier
 
 
+# def __mount_ancestors(json):
+#     ancestors = []
+#     while 'ancestor' in json:
+#         json = json['ancestor']
+#
+#         ancestor_kind = json['kind']
+#         identifier = __get_identifier_from_ancestor(json)
+#         ancestors.append(ancestor_kind)
+#         ancestors.append(identifier)
+#
+#     return ancestors
+
+
 def from_filter_type(value, field_type):
-    options = {'date': __long_to_date,
-               'key': get_key}
+    options = {'date': __long_to_date}
+               # 'key': get_key}
 
     if field_type in options:
         return options[field_type](value)
@@ -123,9 +99,7 @@ def __get_field_type(value):
 
 
 def __long_to_date(value):
-    return datetime.datetime.fromtimestamp(
-        int(value)
-    )
+    return datetime.datetime.fromtimestamp(int(value))
 
 
 def __date_to_long(value):

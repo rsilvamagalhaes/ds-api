@@ -6,19 +6,19 @@ QUERY_LIMIT = 30
 def execute(json):
     kind = json['kind']
 
-    if 'key' in json or 'ancestor' in json:
-        json_result = get_results_from_key(json)
+    if 'key' in json:
+        json_result = result_by_key(json)
+
+    elif 'ancestor' in json:
+        json_result = __result_by_ancestor(json)
 
     else:
+
         entity = entity_api.create_generic_model(kind)
         query = entity.query()
 
-        if 'filters' in json:
-            for query_filter in json['filters']:
-                query = __do_query_based_on_operator(query_filter, query)
-
-        if 'order' in json:
-            query = __order_query(json['order'], query)
+        query = __apply_filters(json, query)
+        query = __apply_orders(json, query)
 
         limit = __set_limit(json)
         fetch = query.fetch(limit)
@@ -37,26 +37,20 @@ def __set_limit(json):
 
 def __to_json(query_result):
 
+    if not isinstance(query_result, list):
+        query_result = [query_result]
+
     result_json = []
     for model in query_result:
 
         if model != None:
-            item = model_to_json(model)
+            item = __model_to_json(model)
             result_json.append(item)
 
     return result_json
 
 
-def __decide_which_key_will_use(json):
-    if 'key' in json:
-        json = json['key']
-    else:
-        json = json['ancestor']
-
-    return json
-
-
-def model_to_json(model):
+def __model_to_json(model):
     json_model = {}
 
     if model:
@@ -76,50 +70,45 @@ def model_to_json(model):
     return json_model
 
 
-def get_results_from_key(json):
+def __result_by_ancestor(json):
+    parent_json = json['ancestor']
+    ancestor_key = entity_api.create_key(parent_json)
+    kind   = json['kind']
+    entity = entity_api.create_generic_model(kind)
 
-    if  not 'id' in json and not 'name' in json:
-        kind   = json['kind']
-
-        ancestor_key = entity_api.create_ancestor_key(json)
-        entity = entity_api.create_generic_model_with_ancestor(kind, ancestor_key)
-        query = entity.query(ancestor=ancestor_key)
-        print query
-        return __to_json(query.fetch(QUERY_LIMIT))
-
-    else:
-        key = entity_api.get_key(json)
-        result_from_db = key.get()
-
-        if not isinstance(result_from_db, list):
-            result_from_db = [result_from_db]
-
-        return __to_json(result_from_db)
+    query = entity.query(ancestor=ancestor_key)
+    return __to_json(query.fetch(QUERY_LIMIT))
 
 
-def get_identifier_from_ancestor(json):
-    identifier = None
+def result_by_key(json):
+    json_key = json['key']
+    key = entity_api.create_key(json_key)
+    result_from_db = key.get()
 
-    if 'name' in json:
-        identifier = json['name']
-    else:
-        if 'id' in json:
-            identifier = long(json['id'])
-
-    return identifier
+    return __to_json(result_from_db)
 
 
-def get_ancestors(json, ancestors):
-    while 'ancestor' in json:
-        ancestor_kind = json['kind']
+def bla():
+    entity = entity_api.create_generic_model('User')
+    query = entity.query()
+    query.filter(ndb.GenericProperty('nome') == "Bob")
+    return query.fetch(keys_only=True)
 
-        json = json['ancestor']
-        identifier = get_identifier_from_ancestor(json)
-        ancestors.append(ancestor_kind)
-        ancestors.append(identifier)
+def __is_ancestor_json(json):
+    return not 'id' in json and not 'name' in json
 
+def __apply_orders(json, query):
+    if 'order' in json:
+        query = __order_query(json['order'], query)
 
-    return ancestors
+    return query
+
+def __apply_filters(json, query):
+    if 'filters' in json:
+        for query_filter in json['filters']:
+            query = __do_query_based_on_operator(query_filter, query)
+
+    return query
 
 
 def __order_query(order_json, query):
