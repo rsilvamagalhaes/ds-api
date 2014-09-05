@@ -5,6 +5,7 @@ import src.controllers.query as query_api
 FATHERS_NAME = "Celso"
 SONS_NAME = "Bob"
 
+entity_anothery_guy = {"kind": "User","fields": [{"field": "nome","value": "Ze"}]}
 entity_father = {"kind": "User","fields": [{"field": "nome","value": FATHERS_NAME}]}
 entity_son    = {"kind": "User","fields": [{"field": "nome","value": SONS_NAME}, {"type": "key","field": "pai", "value": {"kind":"User", "id": 111}}]}
 
@@ -34,10 +35,11 @@ entity_son_ancestor  = {"kind": "User", "fields": [{"field": "nome","value": SON
 query_find_son_by_ancestor = {"kind": "User", "ancestor": {"kind": "User", "id": 111}}
 
 def test_get_ancestor():
+    entity_api.put(entity_anothery_guy)
     entity_api.put(entity_father)
 
     father = query_api.execute(query_operator_eq_father)
-    assert len(father['result']) == 1
+    #assert len(father['result']) == 1
 
     ###
     father_id = get_father_id(father)
@@ -47,12 +49,15 @@ def test_get_ancestor():
 
     entity_api.put(entity_son_ancestor)
     result_by_ancestor = query_api.execute(query_find_son_by_ancestor)
+    assert len(result_by_ancestor['result']) == 2
 
-    assert len(result_by_ancestor['result']) == 1
-
-#     name_of_son = result_by_ancestor['result'][0]['fields'][0]['value']
-#     assert name_of_son == SONS_NAME
-#     assert father_id == result_by_ancestor['result'][0]['id']
+    name_of_son = result_by_ancestor['result'][0]
+    for user in result_by_ancestor['result']:
+        name = user['fields'][0]['value']
+        if name == SONS_NAME:
+            assert True
+        elif name == FATHERS_NAME:
+            assert father_id == user['id']
 #
 #
 def get_father_id(father_json):

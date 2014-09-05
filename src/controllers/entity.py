@@ -8,8 +8,8 @@ def put(json):
     kind = json['kind']
     if 'ancestor' in json:
         json_parent = json['ancestor']
-        parent = create_key(json_parent)
-        p = create_generic_model_with_parent(kind, parent)
+        parent_key = create_key(json_parent)
+        p = create_generic_model_with_parent(kind, parent_key)
     else:
         p = create_generic_model(kind)
 
@@ -56,20 +56,6 @@ def __get_identifier_to_key(json):
         identifier = json['name']
 
     return identifier
-
-
-# def __mount_ancestors(json):
-#     ancestors = []
-#     while 'ancestor' in json:
-#         json = json['ancestor']
-#
-#         ancestor_kind = json['kind']
-#         identifier = __get_identifier_from_ancestor(json)
-#         ancestors.append(ancestor_kind)
-#         ancestors.append(identifier)
-#
-#     return ancestors
-
 
 def from_filter_type(value, field_type):
     options = {'date': __long_to_date}

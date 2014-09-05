@@ -9,10 +9,10 @@ handlers:
 - url: /public
   static_dir: public
 
-- url: /api/query
+- url: /api/query/.*
   script: src.routers.query_router.bottle
 
-- url: /api/entity
+- url: /api/entity/.*
   script: src.routers.entity_router.bottle
 
 - url: /adm

@@ -36,7 +36,6 @@ def __set_limit(json):
 
 
 def __to_json(query_result):
-
     if not isinstance(query_result, list):
         query_result = [query_result]
 
@@ -73,10 +72,9 @@ def __model_to_json(model):
 def __result_by_ancestor(json):
     parent_json = json['ancestor']
     ancestor_key = entity_api.create_key(parent_json)
-    kind   = json['kind']
-    entity = entity_api.create_generic_model(kind)
 
-    query = entity.query(ancestor=ancestor_key)
+    kind = json['kind']
+    query = entity_api.create_generic_model(kind).query(ancestor=ancestor_key)
     return __to_json(query.fetch(QUERY_LIMIT))
 
 
@@ -87,12 +85,6 @@ def result_by_key(json):
 
     return __to_json(result_from_db)
 
-
-def bla():
-    entity = entity_api.create_generic_model('User')
-    query = entity.query()
-    query.filter(ndb.GenericProperty('nome') == "Bob")
-    return query.fetch(keys_only=True)
 
 def __is_ancestor_json(json):
     return not 'id' in json and not 'name' in json
