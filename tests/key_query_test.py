@@ -39,27 +39,24 @@ def test_get_ancestor():
     entity_api.put(entity_father)
 
     father = query_api.execute(query_operator_eq_father)
-    #assert len(father['result']) == 1
+    assert len(father['result']) == 1
 
-    ###
     father_id = get_father_id(father)
     entity_son_ancestor['ancestor']['id'] = father_id
     query_find_son_by_ancestor['ancestor']['id'] = father_id
-    ###
 
     entity_api.put(entity_son_ancestor)
     result_by_ancestor = query_api.execute(query_find_son_by_ancestor)
     assert len(result_by_ancestor['result']) == 2
 
-    name_of_son = result_by_ancestor['result'][0]
     for user in result_by_ancestor['result']:
         name = user['fields'][0]['value']
         if name == SONS_NAME:
             assert True
         elif name == FATHERS_NAME:
             assert father_id == user['id']
-#
-#
+
+
 def get_father_id(father_json):
     return father_json['result'][0]['id']
 

@@ -85,7 +85,7 @@ def __get_field_type(value):
 
 
 def __long_to_date(value):
-    return datetime.datetime.fromtimestamp(int(value))
+    return datetime.datetime.fromtimestamp(value/1000)
 
 
 def __date_to_long(value):
