@@ -19,18 +19,23 @@ def execute(json):
 
         query = __apply_filters(json, query)
         query = __apply_orders(json, query)
-        projections = __get_only_fields(json)
 
-        limit = __set_limit(json)
-        if projections:
-            fetch = query.fetch(limit, projection=projections)
-        else:
-            fetch = query.fetch(limit)
-
+        fetch = __run_query(query, json)
         json_result = __to_json(fetch)
 
     return {'result': json_result}
 
+
+def __run_query(query, json):
+    limit = __set_limit(json)
+    projections = __get_only_fields(json)
+
+    if projections:
+        fetch = query.fetch(limit, projection=projections)
+    else:
+        fetch = query.fetch(limit)
+
+    return fetch
 
 def __set_limit(json):
     limit = QUERY_LIMIT

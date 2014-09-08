@@ -83,20 +83,3 @@ def test_query_order_desc_and_asc():
         for field in entity:
             if 'name' in field['field']:
                 assert names[index] == field['value']
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -16,4 +16,4 @@ handlers:
   script: src.routers.entity_router.bottle
 
 - url: /adm
-  script: src.routers.main.bottle
+  script: src.routers.main_router.bottle
