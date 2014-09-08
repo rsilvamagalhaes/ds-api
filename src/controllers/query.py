@@ -19,9 +19,14 @@ def execute(json):
 
         query = __apply_filters(json, query)
         query = __apply_orders(json, query)
+        projections = __get_only_fields(json)
 
         limit = __set_limit(json)
-        fetch = query.fetch(limit)
+        if projections:
+            fetch = query.fetch(limit, projection=projections)
+        else:
+            fetch = query.fetch(limit)
+
         json_result = __to_json(fetch)
 
     return {'result': json_result}
@@ -89,11 +94,22 @@ def result_by_key(json):
 def __is_ancestor_json(json):
     return not 'id' in json and not 'name' in json
 
+
+def __get_only_fields(json):
+    projections = []
+    if 'fields' in json:
+        for field in json['fields']:
+            projections.append((ndb.GenericProperty(field)))
+
+    return projections
+
+
 def __apply_orders(json, query):
     if 'order' in json:
         query = __order_query(json['order'], query)
 
     return query
+
 
 def __apply_filters(json, query):
     if 'filters' in json:

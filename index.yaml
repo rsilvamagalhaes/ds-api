@@ -35,6 +35,11 @@ indexes:
 
 - kind: User
   properties:
+  - name: nome
+  - name: senha
+
+- kind: User
+  properties:
   - name: senha
   - name: nome
 
