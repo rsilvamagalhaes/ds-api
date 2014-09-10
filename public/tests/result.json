@@ -1,34 +1,37 @@
-{  
-   "result":[  
-      [  
-         {  
-            "field":"field1",
-            "value":"value",
-            "type":"string"
-         },
-         {  
-            "field":"field2",
-            "value":15,
-            "type":"number"
-         },
-         {  
-            "field":"field3",
-            "value":15.5,
-            "type":"number"
-         },
-         {  
-            "field":"field4",
-            "value":1407344794298,
-            "type":"date"
-         },
-         {  
-            "field":"field5",
-            "value": {  
-               "raw" : "raw-data"
-            },
-            "type":"key"
-         }
-      ]
-   ],
-   "cursor":"cursor-data"
-}	
+{
+    "result": [
+        {
+            "kind": "Kind",
+            "fields": [
+                {
+                    "field": "field1",
+                    "value": "value",
+                    "type": "string"
+                },
+                {
+                    "field": "field2",
+                    "value": 15,
+                    "type": "number"
+                },
+                {
+                    "field": "field3",
+                    "value": 15.5,
+                    "type": "number"
+                },
+                {
+                    "field": "field4",
+                    "value": 1407344794298,
+                    "type": "date"
+                },
+                {
+                    "field": "field5",
+                    "value": {
+                        "raw": "raw-data"
+                    },
+                    "type": "key"
+                }
+            ]
+        }
+    ],
+    "cursor": "cursor-data"
+}
