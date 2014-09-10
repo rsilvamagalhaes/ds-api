@@ -156,6 +156,7 @@ define(['jquery'], function($) {
 		var fetch = function() {
 			var jqXHR = $.ajax({
 				dataType: "json",
+				contentType: 'application/json',
 				type: _this.method,
 				url: _this.url,
 				data : JSON.stringify(_this.toJSON())
