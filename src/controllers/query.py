@@ -3,11 +3,15 @@ import src.controllers.entity as entity_api
 
 QUERY_LIMIT = 30
 
+
 def execute(json):
     kind = json['kind']
 
     if 'key' in json:
         json_result = result_by_key(json)
+
+    elif 'id' in json:
+        json_result = __result_by_id(json)
 
     elif 'ancestor' in json:
         json_result = __result_by_ancestor(json)
@@ -37,6 +41,7 @@ def __run_query(query, json):
 
     return fetch
 
+
 def __set_limit(json):
     limit = QUERY_LIMIT
     if 'limit' in json:
@@ -52,7 +57,7 @@ def __to_json(query_result):
     result_json = []
     for model in query_result:
 
-        if model != None:
+        if model is not None:
             item = __model_to_json(model)
             result_json.append(item)
 
@@ -86,6 +91,13 @@ def __result_by_ancestor(json):
     kind = json['kind']
     query = entity_api.create_generic_model(kind).query(ancestor=ancestor_key)
     return __to_json(query.fetch(QUERY_LIMIT))
+
+
+def __result_by_id(json):
+    entity_api.create_generic_model(json['kind'])  # import User 
+    key = entity_api.create_key(json)
+    results = key.get()
+    return __to_json(results)
 
 
 def result_by_key(json):

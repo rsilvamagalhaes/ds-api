@@ -141,8 +141,8 @@ define(['jquery', 'ds-js'], function($, ds) {
 		}
 		this.append = function(result) {
 			_this.view.addRow(_this.query.getCurrentPage(), _this.headers.length);
-			for (var i = 0; i < result.length; i++) {
-				var field = result[i];
+			for (i in result['fields']) {
+				var field = result['fields'][i];
 				processValue(field);
 				processHeader(field);
 			}
@@ -169,9 +169,10 @@ define(['jquery', 'ds-js'], function($, ds) {
 		}
 		var processResults = function(results) {
 			for (var i = 0; i < results.length; i++) {
-				var result = results[i];
-				for (var j = 0; j < result.length; j++) {
-					var field = result[j];
+				
+				var fields = results[i]['fields'];
+				for (var j=0; j<fields.length;j++){
+					var field = fields[j];
 					addHeader(field);
 				}
 			}
