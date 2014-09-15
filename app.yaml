@@ -1,4 +1,4 @@
-application: ds-api
+application: mecsas-dextra
 version: ds-api
 runtime: python27
 api_version: 1
