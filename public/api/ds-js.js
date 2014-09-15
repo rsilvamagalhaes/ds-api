@@ -1,5 +1,14 @@
 define(['jquery'], function($) {
-	function Key() {
+	function Key(kind) {
+
+		var API_URL = '/api/query';
+		var API_METHOD = 'post';
+
+		this.url = API_URL;
+		this.method = API_METHOD;
+		this.cursors = [];
+		this.kind = kind;
+
 		var _this = this;
 		if (arguments.length == 1) {
 			this.raw = arguments[0];
@@ -31,6 +40,53 @@ define(['jquery'], function($) {
 			} else {
 				return $.extend(this.key, {});
 			}
+		}
+		var fetch = function(){
+			var jqXHR = $.ajax({
+				dataType: "json",
+				contentType: 'application/json',
+				type: _this.method,
+				url: _this.url,
+				data : JSON.stringify(_this.toJSON())
+			}).done(function(json) {
+				_this.cursors.push(json.cursor);
+			});
+
+			jqXHR.list = function(cb) {
+				jqXHR.done(function(json) {
+					cb.call(_this, json.result);
+				});
+				return jqXHR;
+			}
+			jqXHR.iterate = function(cb) {
+				jqXHR.done(function(json) {
+					var result = json.result;
+					for (var i = 0; i < result.length; i++) {
+						cb.call(_this, result[i]);
+					}
+				});
+				return jqXHR;
+			}
+			jqXHR.get = function(cb) {
+				jqXHR.done(function(json) {
+					var result = null;
+					if (json.result.length > 0) {
+						result = json.result[0];
+					}
+					cb.call(_this, result);
+				});
+				return jqXHR;
+			}
+
+			return jqXHR;
+		}
+
+		this.execute = function() {
+			this.cursors = [];
+			return fetch();
+		}
+		this.getCurrentPage = function() {
+			return this.cursors.length;		
 		}
 	}
 	Key.raw = function(rawData) {
