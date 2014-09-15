@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 import datetime
-import sys, logging
+import sys
+import logging
 
 
 def put(json):
@@ -31,6 +32,7 @@ def create_generic_model(kind):
 
     return GenericModel()
 
+
 def create_generic_model_with_parent(kind, parent_key):
     class GenericModel(ndb.Expando):
         @classmethod
@@ -56,6 +58,7 @@ def __get_identifier_to_key(json):
         identifier = json['name']
 
     return identifier
+
 
 def from_filter_type(value, field_type):
     options = {'date': __long_to_date}
