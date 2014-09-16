@@ -1,6 +1,7 @@
 from bottle import Bottle, template
 from google.appengine.ext import ndb
-import sys
+from google.appengine.api import users
+import sys, logging
 
 bottle = Bottle()
 
@@ -10,4 +11,5 @@ def error_404(error):
 
 @bottle.get('/adm')
 def adm():
+    logging.info('Usuario eh admin: ' + str(users.is_current_user_admin()))
     return template('src/templates/adm.html')
