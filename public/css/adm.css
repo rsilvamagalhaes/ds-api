@@ -1,3 +1,21 @@
 .main {
 	margin-top: 70px;
 }
+
+#panel-insert {
+	min-height: 140px;
+	padding: 10px;
+}
+
+.input-group {
+	max-width: 400px;
+	margin-top: 15px;
+}
+
+.input-group.kind {
+	margin-bottom: 60px;
+}
+
+.dropdown {
+	margin-top: 15px;
+}

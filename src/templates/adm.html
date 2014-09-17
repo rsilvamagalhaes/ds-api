@@ -39,7 +39,7 @@
 				</ul>
 				
 				<div class="tab-content">
-					<div class="tab-pane active" id="query">
+					<div class="tab-pane" id="query">
 						
 						<div class="panel-group query-panel">
 							<div class="panel panel-default">
@@ -86,8 +86,47 @@
 							</div>
 						</div>
 					</div>
-					<div class="tab-pane" id="insert">
-							
+					<div class="tab-pane active" id="insert">
+						
+						<div class="panel-group">
+							<div class="panel panel-default" id="panel-insert">
+
+
+								<h3>Insert entity</h3>
+								
+								<div class="input-group kind">
+								  <span class="input-group-addon">kind</span>
+								  <input type="text" class="form-control field-kind" placeholder="entity kind">
+								</div>
+
+								<div class="dropdown">
+									<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+									type
+									<span class="caret"></span>
+									</button>
+
+									<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+										<li role="presentation"><a role="menuitem" tabindex="0" href="#">string</a></li>
+										<li role="presentation"><a role="menuitem" tabindex="1" href="#">date</a></li>
+										<li role="presentation" class="divider"></li>
+										<li role="presentation"><a role="menuitem" tabindex="4" href="#">Key</a></li>
+									</ul>
+								</div>
+
+								<div class="input-group" id="list-fields">
+								  <span class="input-group-addon">></span>
+								  <input type="text" class="form-control field-name" placeholder="field name">
+								</div>
+								
+								<div class="input-group">
+								  <span class="input-group-addon">></span>
+								  <input type="text" class="form-control field-value" placeholder="value">
+								</div>
+								
+								<h3><span class="label label-default">novo campo&nbsp<span class="glyphicon glyphicon-plus"></span></span></h3>
+							</div>
+						</div>
+
 					</div>
 				</div>
 		
@@ -103,21 +142,22 @@
 				"paths" : {
 					'jquery' : '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
 					'ds-js' : '/public/api/ds-js',
-					'adm' : '/public/js/adm'
+					'adm' : '/public/js/adm',
+					'insert' : '/public/api/insert'
 				}
 			});	
 
 			$(document).ready(function(){
 				$('#tabs-options a:last').click(function (e) {
-				  // e.preventDefault();
-				  console.info($(this))
+				  e.preventDefault();
 				  $(this).tab('show');
 				})
 			})
 
-			require(['adm', 'ds-js'], function(adm, ds) {
+			require(['adm', 'ds-js', 'insert'], function(adm, ds, insert) {
 				window.ds = ds;
 				adm.init('.query-panel');
+				insert.init();
 			});
 		</script>
 	</body>
