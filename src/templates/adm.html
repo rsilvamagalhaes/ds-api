@@ -99,18 +99,13 @@
 									  <input type="text" class="form-control field-kind" placeholder="entity kind">
 									</div>
 
-									<div class="dropdown">
-										<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-										type
-										<span class="caret"></span>
-										</button>
-
-										<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-											<li role="presentation"><a role="menuitem" tabindex="0" href="#">string</a></li>
-											<li role="presentation"><a role="menuitem" tabindex="1" href="#">date</a></li>
-											<li role="presentation" class="divider"></li>
-											<li role="presentation"><a role="menuitem" tabindex="4" href="#">Key</a></li>
-										</ul>
+									<div class="select-types">
+										<h4>type</h4>
+										<select id="fields-types">
+											<option data-type="0">string</option>
+											<option data-type="1">date</option>
+											<option data-type="2">Key</option>
+										</select>
 									</div>
 
 									<div class="input-group" id="list-fields">
@@ -165,7 +160,9 @@
 				$('#tabs-options a:last').click(function (e) {
 				  e.preventDefault();
 				  $(this).tab('show');
-				})
+				});
+
+				$('.dropdown-toggle').dropdown();
 			})
 
 			require(['adm', 'ds-js', 'insert'], function(adm, ds, insert) {
