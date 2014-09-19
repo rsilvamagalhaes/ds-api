@@ -5,10 +5,15 @@ define(['jquery'], function($, ds) {
 		this.value = null;
 		this.type = null;
 
+		var types = {
+			0: 'string',
+			1: 'date'
+		};
+
 		this.create = function(name, value, type) {
 			this.name = name;
 			this.value = value;
-			this.type = type;
+			this.type = types[type];
 		}
 	}
 
@@ -48,7 +53,13 @@ define(['jquery'], function($, ds) {
 				var field = {};
 
 				field['field'] = item.name;
-				field['value'] = item.value;
+
+				var value = item.value;
+				if (item.type == 'date')
+					value = parseInt(item.value);
+				
+				field['value'] = value;
+				field['type'] = item.type;
 
 				new_fields.push(field);
 			}
@@ -64,16 +75,19 @@ define(['jquery'], function($, ds) {
 		var controller = new InsertController();
 
 		var clickAddNewField = function() {
-
 			$('#add-field').click(function() {
-				var name = $('.field-name').val();
-				var value = $('.field-value').val();
-				var type = 'string';
-
-				controller.add(name, value, type);
-				$('.left .form-control.entity').val('');
-				refreshList();
+				addNewField();
 			});
+		}
+
+		var addNewField = function() {
+			var name = $('.field-name').val();
+			var value = $('.field-value').val();
+			var type = $('#fields-types :selected').attr('data-type');
+
+			controller.add(name, value, type);
+			$('.left .form-control.entity').val('');
+			refreshList();
 		}
 
 		var save = function() {
@@ -81,6 +95,7 @@ define(['jquery'], function($, ds) {
 			$('#saveEntity').click(function(){
 				controller.save().complete(function(){
 					clearAllFields();
+					alert('Informacoes salvas :)')
 				});
 			});
 		}
@@ -103,6 +118,7 @@ define(['jquery'], function($, ds) {
 
 				item.append('<a class="navbar-brand" href="#">'+ fields[i].name + '</a>');
 				item.append('<p class="navbar-text">'+ fields[i].value +'</p>');
+				item.append('<p class="navbar-text type">'+ fields[i].type +'</p>');
 				container.append(item);
 				list.append(container);
 			}
@@ -117,8 +133,18 @@ define(['jquery'], function($, ds) {
 			$('#title-kind-entity').text('Kind Entity');
 		}
 
+		var tapEnterInValue = function() {
+			$('.field-value').keyup(function(e){
+				if(e.keyCode == 13) {
+					addNewField();
+					$('.field-name').focus();
+				}
+			});
+		}
+
 		changeEntityKind();
 		clickAddNewField();
+		tapEnterInValue();
 		save();
 	}
 
