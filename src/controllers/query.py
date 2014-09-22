@@ -57,7 +57,7 @@ def __to_json(query_result):
     result_json = []
     for model in query_result:
 
-        if model is not None:
+        if model:
             item = __model_to_json(model)
             result_json.append(item)
 

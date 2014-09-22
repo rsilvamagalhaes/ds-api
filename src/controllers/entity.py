@@ -71,7 +71,7 @@ def from_filter_type(value, field_type):
 
 
 def to_filter_type(value):
-    options = {'date': __date_to_long}
+    options = {'date': __date_to_long, 'key': __model_to_json}
     field_type = __get_field_type(value)
 
     if field_type in options:
@@ -79,10 +79,11 @@ def to_filter_type(value):
     else:
         return value
 
-
 def __get_field_type(value):
     if type(value) is datetime.datetime:
         return 'date'
+    elif type(value) is ndb.Expando:
+        return 'key'
     else:
         return None
 
@@ -90,6 +91,8 @@ def __get_field_type(value):
 def __long_to_date(value):
     return datetime.datetime.fromtimestamp(value/1000)
 
+def __model_to_json(value):
+    return value._to_dict()['kind']
 
 def __date_to_long(value):
     return __unix_time_millis(value)

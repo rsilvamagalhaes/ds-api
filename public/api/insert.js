@@ -1,4 +1,4 @@
-define(['jquery','ds-js'], function($, ds) {
+define(['jquery'], function($) {
 
 	function InsertModel() {
 		this.modelKind = null;
@@ -11,7 +11,8 @@ define(['jquery','ds-js'], function($, ds) {
 		var types = {
 			0: 'string',
 			1: 'date',
-			2: 'key'
+			2: 'key',
+			3: 'list'
 		};
 
 		this.create = function(modelKind, name, value, type, kind) {
@@ -61,18 +62,7 @@ define(['jquery','ds-js'], function($, ds) {
 				var field = {};
 
 				field['field'] = item.name;
-
-				var value = item.value;
-				if (item.type == 'date')
-					value = parseInt(item.value);
-				
-				if (item.type == 'key') {
-					value = {};
-					value['kind'] = item.kind;
-					value['id'] = item.value;
-				}
-
-				field['value'] = value;
+				field['value'] = filterType(item);
 				field['type'] = item.type;
 
 				new_fields.push(field);
@@ -81,6 +71,28 @@ define(['jquery','ds-js'], function($, ds) {
 			json['fields'] = new_fields;
 
 			return json;
+		}
+
+		var filterType = function(item) {
+			var value = item.value;
+			if (item.type == 'date')
+				value = parseInt(item.value);
+			else
+				if (item.type == 'key') {
+					value = {};
+					value['kind'] = item.kind;
+					value['id'] = item.value;
+				}
+				else 
+					if (item.type == 'list') {
+						var items = value.split(',')
+						var all_itens = []
+						for (i in items)
+							all_itens.push(items[i].replace(' ',''));
+						value = all_itens	
+					}
+
+			return value;
 		}
 	}
 
@@ -144,10 +156,13 @@ define(['jquery','ds-js'], function($, ds) {
 		var showKeyField = function() {
 			$('#fields-types').change(function(){
 				var type = $('#fields-types option:selected').attr('data-type');
-				console.info('tipo', type);
+
 				if (type==2) {
 					$('#item-kind').show();
+				} else if (type==3) {
+					$('.form-control.field-value.entity').attr('placeholder','ex: item1,item2,item3')
 				} else {
+					$('.form-control.field-value.entity').attr('value');
 					$('#item-kind').hide();
 				}
 			});
