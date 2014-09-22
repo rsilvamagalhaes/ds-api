@@ -16,6 +16,10 @@
 	margin-bottom: 60px;
 }
 
+#item-kind {
+	display: inline-table;
+}
+
 .dropdown {
 	margin-top: 15px;
 }

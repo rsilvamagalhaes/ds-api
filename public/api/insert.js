@@ -1,19 +1,25 @@
-define(['jquery'], function($, ds) {
+define(['jquery','ds-js'], function($, ds) {
 
 	function InsertModel() {
+		this.modelKind = null;
+
 		this.name = null;
 		this.value = null;
 		this.type = null;
+		this.kind = null;
 
 		var types = {
 			0: 'string',
-			1: 'date'
+			1: 'date',
+			2: 'key'
 		};
 
-		this.create = function(name, value, type) {
+		this.create = function(modelKind, name, value, type, kind) {
+			this.modelKind = modelKind;
 			this.name = name;
 			this.value = value;
 			this.type = types[type];
+			this.kind = kind;
 		}
 	}
 
@@ -21,15 +27,18 @@ define(['jquery'], function($, ds) {
 
 		var fields = [];
 
-		this.add = function(name, value, type) {
+		this.add = function(modelKind, name, value, type, kind) {
 			var insert = new InsertModel();
-			insert.create(name, value, type)
-
+			insert.create(modelKind, name, value, type, kind);
 			fields.push(insert);
 		}
 
 		this.getAllFields = function() {
 			return fields;
+		}
+
+		this.clearFields = function(){
+			fields = [];
 		}
 
 		this.save = function() {
@@ -45,10 +54,9 @@ define(['jquery'], function($, ds) {
 		this.toJSON = function() {
 			var json = {};
 
-			json['kind'] = 'User';
+			json['kind'] = fields[0].modelKind;
 			var new_fields = [];
 			for (i in fields) {
-
 				var item = fields[i];
 				var field = {};
 
@@ -58,6 +66,12 @@ define(['jquery'], function($, ds) {
 				if (item.type == 'date')
 					value = parseInt(item.value);
 				
+				if (item.type == 'key') {
+					value = {};
+					value['kind'] = item.kind;
+					value['id'] = item.value;
+				}
+
 				field['value'] = value;
 				field['type'] = item.type;
 
@@ -81,21 +95,23 @@ define(['jquery'], function($, ds) {
 		}
 
 		var addNewField = function() {
+			var modelKind = $('.form-control.field-kind').val();
 			var name = $('.field-name').val();
 			var value = $('.field-value').val();
 			var type = $('#fields-types :selected').attr('data-type');
+			var kind = $('#item-kind input').val();
 
-			controller.add(name, value, type);
+			controller.add(modelKind, name, value, type, kind);
 			$('.left .form-control.entity').val('');
 			refreshList();
 		}
 
 		var save = function() {
-
 			$('#saveEntity').click(function(){
 				controller.save().complete(function(){
 					clearAllFields();
-					alert('Informacoes salvas :)')
+					controller.clearFields();
+					alert('Informacoes salvas')
 				});
 			});
 		}
@@ -107,7 +123,6 @@ define(['jquery'], function($, ds) {
 		}
 
 		var refreshList = function() {
-
 			$('#created-fields > div').remove();
 			var list = $('#created-fields');
 
@@ -126,11 +141,25 @@ define(['jquery'], function($, ds) {
 			$('#created-fields').show();
 		};
 
+		var showKeyField = function() {
+			$('#fields-types').change(function(){
+				var type = $('#fields-types option:selected').attr('data-type');
+				console.info('tipo', type);
+				if (type==2) {
+					$('#item-kind').show();
+				} else {
+					$('#item-kind').hide();
+				}
+			});
+		}
+
 		var clearAllFields = function() {
 			$('#created-fields').hide();
 			$('#created-fields > div').remove();
 			$('.left .form-control').val('');
 			$('#title-kind-entity').text('Kind Entity');
+			$('#item-kind').val('');
+			$('#item-kind').hide();
 		}
 
 		var tapEnterInValue = function() {
@@ -142,6 +171,7 @@ define(['jquery'], function($, ds) {
 			});
 		}
 
+		showKeyField();
 		changeEntityKind();
 		clickAddNewField();
 		tapEnterInValue();
