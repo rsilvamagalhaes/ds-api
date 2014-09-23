@@ -9,7 +9,7 @@ bottle = Bottle()
 def error_404(error):
     return 'Sorry, nothing at this URL.'
 
-@bottle.get('/adm')
+@bottle.get('/consoleadm')
 def adm():
     logging.info('Usuario eh admin: ' + str(users.is_current_user_admin()))
     if users.get_current_user():
