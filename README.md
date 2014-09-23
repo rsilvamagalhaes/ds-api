@@ -1,7 +1,6 @@
 ## Console para Datastore do Google App Engine
-> ferramenta para ajudar na manipulação do datastore do GAE, dado
-> que o Datastore Viewer não é muito fácil de usar
-> você pode ver um [Live Demo](http://console.datastore-console.appspot.com/adm)
+ > ferramenta para ajudar na manipulação do datastore do GAE, dado que o Datastore Viewer não é muito fácil de usar
+ > você pode ver um [Live Demo](http://console.datastore-console.appspot.com/adm)
 
 ### Como consultar
  - new ds.Query('User')
