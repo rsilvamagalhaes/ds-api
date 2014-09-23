@@ -7,7 +7,7 @@
  - new ds.Query('User').limit(10)
 
  - new ds.Key('Kind', id)
- - new ds.Key('Kind', name)
+ - new ds.Key('Kind', 'name')
 
 #### Filtros 
 1. EQUAL
