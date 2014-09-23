@@ -47,7 +47,7 @@
 > appcfg.py --oauth2  update .
 
 #### Segurança
-###### Por default as urls estão desprotegidas. Para que somente usuarios admin possam utilizar, altere seu app.yaml: 
+###### Por default as urls estão desprotegidas. Para que somente usuários admin possam utilizar, altere seu app.yaml: 
 > Descomente as linhas:
 ```
  # auth_fail_action: redirect
@@ -56,6 +56,7 @@
 
 ###### Agora acesse:
 > http://versao.seuapp.appspot.com/adm 
-###### Para que outros usuarios tenham acesso à ferramenta, acesse o Datastore Admin no painel do Google App Engine
+
+###### Para que outros usuarios tenham acesso à ferramenta, acesse o Datastore Admin no painel do Google App Engine e altere as permissões
 
 
