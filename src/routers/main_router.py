@@ -4,7 +4,7 @@ import logging
 
 bottle = Bottle()
 
-@bottle.get('/consoleadm')
+@bottle.get('/adm')
 def adm():
     logging.info('Usuario eh admin: ' + str(users.is_current_user_admin()))
     if users.get_current_user():

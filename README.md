@@ -1,6 +1,7 @@
 ## Console para Datastore do Google App Engine
-> ferramenta com intuito de ajudar na manipulação do datastore do GAE, dado
+> ferramenta para ajudar na manipulação do datastore do GAE, dado
 > que o Datastore Viewer não é muito fácil de usar
+> você pode ver um [Live Demo](http://console.datastore-console.appspot.com/adm)
 
 ### Como consultar
  - new ds.Query('User')
@@ -33,7 +34,7 @@
   1. new ds.Query('User').lt('campo', 'valor')
 
  8. LTE
- 1 . new ds.Query('User').lte('campo', 'valor')
+  1. new ds.Query('User').lte('campo', 'valor')
 
 ### Como usar na sua aplicação
 > git clone git@github.com:filipesimoes/ds-api.git

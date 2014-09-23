@@ -19,7 +19,7 @@ handlers:
   login: admin
   auth_fail_action: redirect
 
-- url: /consoleadm
+- url: /adm
   script: src.routers.main_router.bottle
   auth_fail_action: redirect
   login: admin
