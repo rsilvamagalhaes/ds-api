@@ -10,30 +10,30 @@
  - new ds.Key('Kind', 'name')
 
 #### Filtros 
-1.EQUAL
-1.1 new ds.Query('User').eq('campo','valor')
+ 1. EQUAL
+  1. new ds.Query('User').eq('campo','valor')
 
-2.IN 
-2.1 new ds.Query('User').inEq('campo','valor')
+ 2. IN 
+  1. new ds.Query('User').inEq('campo','valor')
 
-3.ORDER
- 3.1 new ds.Query('User').order(*'campo1', 'campo2'*)
- 3.2 new ds.Query('User').orderDesc(*'campo1', 'campo2'*)
+ 3. ORDER
+  1. new ds.Query('User').order(*'campo1', 'campo2'*)
+  2. new ds.Query('User').orderDesc(*'campo1', 'campo2'*)
 
-4.NOT EQUAL
- 4.1 new ds.Query('User').neq('campo', 'valor')
+ 4. NOT EQUAL
+  1. new ds.Query('User').neq('campo', 'valor')
 
-5.GT 
- 5.1 new ds.Query('User').gt('campo', 'valor')
+ 5. GT 
+  1. new ds.Query('User').gt('campo', 'valor')
 
-6.GTE
- 6.1 new ds.Query('User').gte('campo', 'valor')
+ 6. GTE
+  1. new ds.Query('User').gte('campo', 'valor')
 
-7.LT
- 7.1 new ds.Query('User').lt('campo', 'valor')
+ 7. LT
+  1. new ds.Query('User').lt('campo', 'valor')
 
-8.LTE
- 8.1 new ds.Query('User').lte('campo', 'valor')
+ 8. LTE
+ 1 . new ds.Query('User').lte('campo', 'valor')
 
 ### Como usar na sua aplicação
 > git clone git@github.com:filipesimoes/ds-api.git
