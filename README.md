@@ -40,7 +40,7 @@
 > git clone git@github.com:filipesimoes/ds-api.git
 
 #### Abra o arquivo app.yaml, localizado na raiz do projeto
-1. Edite o valor do *aplication* para o id da sua aplicação
+1. Edite o valor do **aplication** para o id da sua aplicação
 
 #### Faça upload
 > appcfg.py update .
@@ -48,7 +48,7 @@
 > appcfg.py --oauth2  update .
 
 #### Segurança
-###### Por default as urls estão protegidas, para que somente usuários admin possam utilizar. Para que qualquer usuário possa acessar o console. altere seu app.yaml: 
+###### Por default as urls estão protegidas, para que somente usuários admin possam utilizar. Para que qualquer usuário possa acessar o console altere seu app.yaml: 
 > Comente as linhas:
 ```
  # auth_fail_action: redirect
@@ -56,7 +56,7 @@
 ```
 
 ###### Agora acesse:
-> http://seuapp.appspot.com/adm 
+> http://console.seuapp.appspot.com/adm 
 
 ###### Para que outros usuarios tenham acesso à ferramenta, acesse o Datastore Admin no painel do Google App Engine e altere as permissões
 
