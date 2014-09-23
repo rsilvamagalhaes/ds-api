@@ -47,8 +47,22 @@
 > appcfg.py --oauth2  update .
 
 #### Segurança
-##### Por padrão somente usuários com a role de admin poderão acessar a url
-> http://versao.seuapp.appspot.com/adm 
+###### Por default as urls estão desprotegidas. Para que somente usuarios admin possam utilizar, altere seu app.yaml, para: 
+> - url: /adm
+  script: src.routers.main_router.bottle
+  **auth_fail_action: redirect**
+  **login: admin**
+- url: /api/query
+  script: src.routers.query_router.bottle
+  **login: admin**
+  **auth_fail_action: redirect**
+- url: /api/entity
+  script: src.routers.entity_router.bottle
+  **login: admin**
+  **auth_fail_action: redirect**
 
-##### Para que outros usuarios tenham acesso à ferramenta, acesse o Datastore Admin no painel do Google App Engine
+###### Agora acesse:
+> http://versao.seuapp.appspot.com/adm 
+###### Para que outros usuarios tenham acesso à ferramenta, acesse o Datastore Admin no painel do Google App Engine
+
 
