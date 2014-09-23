@@ -48,7 +48,8 @@
 
 #### Segurança
 ###### Por default as urls estão desprotegidas. Para que somente usuarios admin possam utilizar, altere seu app.yaml, para: 
-> - url: /adm
+> ``` 
+- url: /adm
   script: src.routers.main_router.bottle
   **auth_fail_action: redirect**
   **login: admin**
@@ -60,6 +61,7 @@
   script: src.routers.entity_router.bottle
   **login: admin**
   **auth_fail_action: redirect**
+  ```
 
 ###### Agora acesse:
 > http://versao.seuapp.appspot.com/adm 
