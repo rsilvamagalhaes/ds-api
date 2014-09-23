@@ -62,7 +62,7 @@ define(['jquery'], function($) {
 				var field = {};
 
 				field['field'] = item.name;
-				field['value'] = filterType(item);
+				field['value'] = createValueByFilter(item);
 				field['type'] = item.type;
 
 				new_fields.push(field);
@@ -73,7 +73,7 @@ define(['jquery'], function($) {
 			return json;
 		}
 
-		var filterType = function(item) {
+		var createValueByFilter = function(item) {
 			var value = item.value;
 			if (item.type == 'date')
 				value = parseInt(item.value);

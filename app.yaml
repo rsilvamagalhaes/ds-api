@@ -1,5 +1,5 @@
 application: datastore-console
-version: 1
+version: console
 runtime: python27
 api_version: 1
 threadsafe: no
@@ -19,7 +19,7 @@ handlers:
   login: admin
   auth_fail_action: redirect
 
-- url: /adm
+- url: /consoleadm
   script: src.routers.main_router.bottle
   auth_fail_action: redirect
   login: admin

@@ -1,8 +1,13 @@
 ## Console para Datastore do Google App Engine
+> ferramenta com intuito de ajudar na manipulação do datastore do GAE, dado
+> que o Datastore Viewer não é muito fácil de usar
 
 ### Como consultar
  - new ds.Query('User')
  - new ds.Query('User').limit(10)
+
+ - new ds.Key('Kind', id)
+ - new ds.Key('Kind', name)
 
 #### Filtros 
 1. EQUAL
@@ -30,7 +35,7 @@
 8. LTE
  8.1 new ds.Query('User').lte('campo', 'valor')
 
-### Como usar
+### Como usar na sua aplicação
 > git clone 
 
 #### Abra o arquivo app.yaml, localizado na raiz do projeto
